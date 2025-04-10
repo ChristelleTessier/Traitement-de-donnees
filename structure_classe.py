@@ -1,30 +1,6 @@
 from datetime import date
 import pandas as pd
 
-def creer_joueur(id_joueur = None, prenom = None, nom = None):
-    if id_joueur is None and (prenom is None or nom is None) :
-        return None
-    # Chargement des joueur ATP
-    data_homme = pd.read_csv("Donnees\ATP_players.csv")
-    # Chargement des joueur ATP
-    data_femme = pd.read_csv("Donnees\WTA_players.csv")
-
-    if id_joueur is not None:
-        if id_joueur in data_homme["player_id"]:
-            joueur = Joueur(id_joueur,
-            data_homme(data_homme["player_id"]==id_joueur)["name_first"],
-            data_homme(data_homme["player_id"]==id_joueur)["name_last"],
-            data_homme(data_homme["player_id"]==id_joueur)["hand"],
-            data_homme(data_homme["player_id"]==id_joueur)["ioc"],
-            "test",
-            data_homme(data_homme["player_id"]==id_joueur)["height"])
-            return joueur
-
-
-
-
-
-
 
 class Joueur:
     def __init__(self, id_joueur: int, prenom: str, nom: str, sexe : str,
@@ -81,3 +57,57 @@ class Rang:
         self.date = date
         self.rang = rang
         self.points = points
+
+
+def creer_joueur(id=None, prenom=None, nom=None):
+    if id is None and (prenom is None or nom is None):
+        return None
+
+    # Chargement des joueurs ATP/WTA
+    data_homme = pd.read_csv("Donnees/ATP_players.csv",low_memory=False)
+    data_femme = pd.read_csv("Donnees/WTA_players.csv",low_memory=False)
+
+    ligne_joueur = None
+    genre = None
+
+
+    # Récupération de la bonne ligne
+    if id is not None:
+        if id in data_homme["player_id"].values:
+            ligne_joueur = data_homme[data_homme["player_id"] == id]
+            genre = "H"
+        elif id in data_femme["player_id"].values:
+            ligne_joueur = data_femme[data_femme["player_id"] == id]
+            genre = "F"
+
+    elif prenom is not None and nom is not None:
+        # Recherche chez les hommes
+        match_homme = data_homme[
+            (data_homme["name_last"] == nom) & (data_homme["name_first"] == prenom)
+        ]
+        if not match_homme.empty:
+            ligne_joueur = match_homme
+            genre = "H"
+
+        # Recherche chez les femmes
+        match_femme = data_femme[
+            (data_femme["name_last"] == nom) & (data_femme["name_first"] == prenom)
+        ]
+        if not match_femme.empty:
+            ligne_joueur = match_femme
+            genre = "F"
+
+    # Création du joueur
+    if ligne_joueur is not None:
+        joueur = Joueur(id_joueur = ligne_joueur["player_id"].values[0],
+                            prenom = ligne_joueur["name_first"].values[0],
+                            nom = ligne_joueur["name_last"].values[0],
+                            sexe = genre,
+                            main = ligne_joueur["hand"].values[0],
+                            nationalite = ligne_joueur["ioc"].values[0],
+                            date_nais = 0,
+                            taille = ligne_joueur["height"].values[0])
+    else:
+        joueur = None
+
+    return joueur
