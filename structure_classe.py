@@ -34,25 +34,35 @@ class Tournoi:
 
 class MatchSimple:
     def __init__(self, id_match: int, id_tournoi: int,
-                 id_vainqueur: int, id_perdant: int,
+                 id_vainqueur: int, id_perdant: int, nom_tournoi : str,
+                 nom_vainqueur : str, nom_perdant: str,
                  round: str, nb_set: int, score: str, temps: int):
         self.id_match = id_match
         self.id_tournoi = id_tournoi
         self.id_vainqueur = id_vainqueur
         self.id_perdant = id_perdant
+        self.nom_tournoi = nom_tournoi
+        self.nom_vainqueur = nom_vainqueur
+        self.nom_perdant = nom_perdant
         self.round = round
         self.nb_set = nb_set
         self.score = score
         self.temps = temps
 
         def __str__(self):
-            chaine = str(self.round) + " du tournoi"
+            chaine = str(self.round) + " du tournoi " + str(self.nom_tournoi) + " vainqueur : "
+            chaine += str(self.nom_vainqueur) + "perdant : " + str(self.nom_perdant)
+            chaine +=  "victoire en " + str(self.nb_set) + " en " + str(self.temps) + " min"
+            chaine += ", score final :" + str(self.score)
             return chaine
 
 class MatchDouble:
     def __init__(self, id_match: int, id_tournoi: int,
                  id_vainqueur1: int, id_vainqueur2: int,
                  id_perdant1: int, id_perdant2: int,
+                 nom_tournoi : str,
+                 nom_vainqueur1 : str, nom_perdant1: str,
+                 nom_vainqueur2 : str, nom_perdant2: str,
                  round: str, nb_set: int, score: str, temps: int):
         self.id_match = id_match
         self.id_tournoi = id_tournoi
@@ -64,6 +74,13 @@ class MatchDouble:
         self.nb_set = nb_set
         self.score = score
         self.temps = temps
+
+        def __str__(self):
+            chaine = str(self.round) + " du tournoi " + str(self.nom_tournoi) + " vainqueur : "
+            chaine += str(self.nom_vainqueur) + "perdant : " + str(self.nom_perdant)
+            chaine +=  "victoire en " + str(self.nb_set) + " en " + str(self.temps) + " min"
+            chaine += ", score final :" + str(self.score)
+            return chaine
 
 class Stat:
     def __init__(self, id_match: int, id_joueur: int,

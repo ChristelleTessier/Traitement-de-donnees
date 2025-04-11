@@ -106,20 +106,20 @@ def creer_match(infos):
 
         nom = type + liste_chemin[indice] + annee +".csv"
 
-        if nom in liste_fichier:
-            if type == 'atp':
-                nom = "donnees_tennis/ATP/" + nom
-            else :
-                nom = "donnees_tennis/WTA/" + nom
+        nom = liste_fichier[indice]
+        if type == 'atp':
+            nom = "donnees_tennis/ATP/" + nom
+        else :
+            nom = "donnees_tennis/WTA/" + nom
 
-            data = pd.read_csv(nom, low_memory=False)
+        data = pd.read_csv(nom, low_memory=False)
 
-            ligne_match = data[
-                    (data["tourney_id"] == tournoi_id) & (data["match_num"] == nu_match)
+        ligne_match = data[
+                (data["tourney_id"] == tournoi_id) & (data["match_num"] == nu_match)
                 ]
 
-            if ligne_match.empty:
-                ligne_match = None
+        if ligne_match.empty:
+            ligne_match = None
 
         elif ligne_match is None:
         # Le match n'appartient pas au dataFrame
@@ -138,6 +138,9 @@ def creer_match(infos):
             match = MatchSimple( id_match = infos,
                                  id_vainqueur = ligne_match["winner_id"].values[0],
                                  id_perdant = ligne_match["loser_id"].values[0],
+                                 nom_tournoi = ligne_match["tourney_name"].values[0],
+                                 nom_vainqueur = ligne_match["winner_name"].values[0],
+                                 nom_perdant = ligne_match["loser_name"].values[0],
                                  round = ligne_match["round"].values[0],
                                  nb_set = ligne_match["best_of"].values[0],
                                  score = ligne_match["score"].values[0],
@@ -148,6 +151,11 @@ def creer_match(infos):
                                  id_vainqueur2 = ligne_match["winner2_id"].values[0],
                                  id_perdant1 = ligne_match["loser_id1"].values[0],
                                  id_perdant2 = ligne_match["loser_id2"].values[0],
+                                 nom_tournoi = ligne_match["tourney_name"].values[0],
+                                 nom_vainqueur1 = ligne_match["winner1_name"].values[0],
+                                 nom_perdant1 = ligne_match["loser1_name"].values[0],
+                                 nom_vainqueur2 = ligne_match["winner2_name"].values[0],
+                                 nom_perdant2 = ligne_match["loser2_name"].values[0],
                                  round = ligne_match["round"].values[0],
                                  nb_set = ligne_match["best_of"].values[0],
                                  score = ligne_match["score"].values[0],
@@ -196,19 +204,19 @@ def creer_stat(id, infos):
 
         nom = type + liste_chemin[indice] + annee +".csv"
 
-        if nom in liste_fichier:
-            if type == 'atp':
-                nom = "donnees_tennis/ATP/" + nom
-            else :
-                nom = "donnees_tennis/WTA/" + nom
+        nom = liste_fichier[indice]
+        if type == 'atp':
+            nom = "donnees_tennis/ATP/" + nom
+        else :
+            nom = "donnees_tennis/WTA/" + nom
 
-            data = pd.read_csv(nom, low_memory=False)
+        data = pd.read_csv(nom, low_memory=False, encoding='utf-8')
 
-            ligne_match = data[
-                    (data["tourney_id"] == tournoi_id) & (data["match_num"] == nu_match)
+        ligne_match = data[
+                (data["tourney_id"] == tournoi_id) & (data["match_num"] == nu_match)
                 ]
 
-            if ligne_match.empty:
+        if ligne_match.empty:
                 ligne_match = None
 
         if ligne_match is None:
@@ -221,7 +229,7 @@ def creer_stat(id, infos):
                 indice_type = "double"
 
 
-    # Création du joueur
+    # Création du match
     if ligne_match is not None:
 
         # Récupération de information winner, loser (winner1, winner2, loser1 ou loser2)
@@ -331,6 +339,9 @@ def creer_tournoi(id):
 
 tournoi = creer_tournoi("2023-M-ITF-ARG-01A-2023")
 print(tournoi)
+
+rencontre = creer_match(['atp', '2023', '2023-M-ITF-ARG-01A-2023', 101])
+print(rencontre)
 
 joueur = creer_joueur(id = 100001)
 print(joueur)
