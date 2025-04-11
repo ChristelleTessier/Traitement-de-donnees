@@ -105,7 +105,7 @@ def creer_match(infos):
         if ligne_match.empty:
             ligne_match = None
 
-        elif ligne_match is None:
+        if ligne_match is None:
         # Le match n'appartient pas au dataFrame
             indice += 1
         else:
