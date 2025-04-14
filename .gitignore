@@ -1,5 +1,10 @@
 <<<<<<< HEAD
+# Ignorer tous les fichiers .csv
 *.csv
+
+# Sauf ceux dans Donnes/
+!Donnes/
+!Donnes/*.csv
 =======
 # Byte-compiled / optimized / DLL files
 __pycache__/
