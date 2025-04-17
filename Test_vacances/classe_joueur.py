@@ -13,10 +13,12 @@ class Joueur:
         chaine = str(self.nom) + " " + str(self.prenom)
         return chaine
 
-    def chercher_matchs_annee(self,annee):
+    def chercher_matchs(self,annee =None):
         """ renvois un tableau avec tous les matchs de l'année """
 
         player_id =self.id_joueur
+
+        # Intialisation au dataFrame
         data_result = pd.DataFrame()
 
         if self.sexe == 'H':
@@ -31,35 +33,35 @@ class Joueur:
                             "Donnees/wta_matches_qual_1968_2024.csv"
                             ]
 
+        # Récupération du dernier match joué par tournoi
+        liste_round_complet = ['R128', 'R64', 'R32', 'R16', 'QS', 'SF', 'F']
 
+        liste_mapping  = [ [1,'128ème de finale'], [2,'64ème de finale'] ,
+                        [3, '32ème de finale'], [4, '16ème de finale'], [5,'Quart de finale'],
+                        [6,'Demi-finale'], [7,'Finale'] ]
 
-        for indice,fichier in enumerate(liste_fichier) :
+        # Construire les dictionnaires à partir du mapping
+        round_priority = dict(zip(liste_round_complet, [item[0] for item in liste_mapping]))
+        round_label = dict(zip(liste_round_complet, [item[1] for item in liste_mapping]))
 
-            # Récupération du dernier match joué par tournoi
-            liste_round_complet = ['R128', 'R64', 'R32', 'R16', 'QS', 'SF', 'F']
-
-            liste_mapping  = [ [1,'128ème de finale'], [2,'64ème de finale'] ,
-                            [3, '32ème de finale'], [4, '16ème de finale'], [5,'Quart de finale'],
-                            [6,'Demi-finale'], [7,'Finale'] ]
-
-            # Construire les dictionnaires à partir du mapping
-            round_priority = dict(zip(liste_round_complet, [item[0] for item in liste_mapping]))
-            round_label = dict(zip(liste_round_complet, [item[1] for item in liste_mapping]))
-
-            # Etape 1 : Selection des données dans le dataFrame
+        # Parcours des fichier de matchs
+        for indice,fichier in enumerate(liste_fichier):
 
             # Récupération du fichier
-            data = pd.read_csv(fichier,low_memory=False, index_col=False)
-            if 'doubles' in fichier :
+            data = pd.read_csv(fichier,low_memory=False)
 
+            if annee is not None:
                 # Filtre sur les année
-                data = data[data['annee'] == annee]
+                data = data[data['annee'] == annee].copy()
+
+            if 'doubles' in fichier :
 
                 # Selection des variables intérets
                 var_interet = ["tourney_date","tourney_name","surface","round",
                                 'winner1_id','winner2_id',"loser1_id",'loser2_id']
 
                 data = data[var_interet]
+
                 # selection des ligne ou le joueur à joué
                 mask = ((data['winner1_id'] == player_id) |
                         (data['loser1_id'] == player_id) |
@@ -67,9 +69,6 @@ class Joueur:
                         (data['loser2_id'] == player_id)
                         )
                 data = data[mask]
-
-                # Type de match : simple ou double
-                data["type"] = 'double'
 
                 # Création d'une variables resultat qui vaut 1 si le match est gagné et 0 sinon
                 data['resultat'] = 0
@@ -79,29 +78,7 @@ class Joueur:
                 # Suppression "winner_id" et "loser_id"
                 data = data.drop(columns=['winner1_id', 'loser1_id','winner2_id', 'loser2_id'])
 
-                # Récupération du dernier match joué du tournoi
-                liste_tournoi = data["tourney_name"].unique()
-                for tournoi in liste_tournoi:
-                    data_tournoi = data[data["tourney_name"] == tournoi].copy()
-
-                    # Ajouter les colonnes de priorité et de label
-                    data_tournoi["round_priority"] = data_tournoi["round"].map(round_priority)
-                    data_tournoi["round_label"] = data_tournoi["round"].map(round_label)
-
-                    # Garder uniquement le match le plus avancé par joueur
-                    match_best = data_tournoi[data_tournoi["round_priority"] == data_tournoi["round_priority"].max()]
-
-                    # Néttoyage
-                    match_best = match_best.drop(columns=["round_priority", "round"])
-
-                    # Ajout au tableau des dataframe
-                    data_result = pd.concat([data_result, match_best], axis=0)
-
             else :
-
-                # Filtre sur les année
-                data = data[data['annee'] == annee]
-
                 # Selection des variables intérets
                 data = data[["tourney_date","tourney_name","surface","round",'winner_id','loser_id']]
 
@@ -111,9 +88,6 @@ class Joueur:
                         )
                 data = data[mask]
 
-                # Type de match : simple ou double
-                data["type"] = 'simple'
-
                 # Création d'une variables resultat qui vaut 1 si le match est gagné et 0 sinon
                 data['resultat'] = 0
                 data.loc[data['winner_id'] == player_id, 'resultat'] = 1
@@ -121,30 +95,55 @@ class Joueur:
                 # Suppression "winner_id" et "loser_id"
                 data = data.drop(columns=['winner_id', 'loser_id'])
 
-                # Récupération du dernier match joué du tournoi
-                liste_tournoi = data["tourney_name"].unique()
-                for tournoi in liste_tournoi:
-                    data_tournoi = data[data["tourney_name"] == tournoi].copy()
+            if indice == 0:
+                data['type'] = 'simple'
+            elif indice ==1 and self.sexe == 'H':
+                data['type'] = 'double'
+            elif indice == 1:
+                data['type'] = 'qualificatif'
+            elif indice == 2:
+                data['type'] = 'espoir'
+            else: # indice = 3
+                data['type'] = 'qualificatif'
 
-                    # Ajouter les colonnes de priorité et de label
-                    data_tournoi["round_priority"] = data_tournoi["round"].map(round_priority)
-                    data_tournoi["round_label"] = data_tournoi["round"].map(round_label)
 
-                    # Garder uniquement le match le plus avancé par joueur
-                    match_best = data_tournoi[data_tournoi["round_priority"] == data_tournoi["round_priority"].max()]
+            # Récupération du dernier match joué du tournoi
+            liste_tournoi = data["tourney_name"].unique()
+            for tournoi in liste_tournoi:
+                data_tournoi = data[data["tourney_name"] == tournoi].copy()
 
-                    # Néttoyage
-                    match_best = match_best.drop(columns=["round_priority", "round"])
+                # Ajouter les colonnes de priorité et de label
+                data_tournoi["round_priority"] = data_tournoi["round"].map(round_priority)
+                data_tournoi["round_label"] = data_tournoi["round"].map(round_label)
 
-                    # Ajout au tableau des dataframe
-                    data_result = pd.concat([data_result, match_best], axis=0)
+                # Garder uniquement le match le plus avancé par joueur
+                match_best = data_tournoi[data_tournoi["round_priority"] == data_tournoi["round_priority"].max()]
+
+                # Néttoyage
+                match_best = match_best.drop(columns=["round_priority", "round"])
+
+                # Ajout au tableau des dataframe
+                data_result = pd.concat([data_result, match_best], axis=0)
+
+        # Rétirer les nom de colonne commencant par 'Unnamed'
+        data_result = data_result.loc[:, ~data.columns.str.startswith('Unnamed')]
+
+        # Réordonner les colonnes
+        # Liste des colonnes dans l'ordre souhaité
+        colonnes_souhaitees = ['tourney_date', 'tourney_name', 'surface', 'type' , 'resultat', 'round_label']
+
+        # Réorganiser les colonnes (en gardant seulement celles qui existent dans le DataFrame)
+        colonnes_presentes = [col for col in colonnes_souhaitees if col in data_result.columns]
+        data_result = data_result[colonnes_presentes]
 
         return data_result
 
-    def chercher_tournoi_annee(self,annee):
-        """ renvois un tableau avec tous les tournoi gagné de l'année """
+    def chercher_tournois(self,annee = None):
+        """ renvois un tableau avec tous tournois gagnés de l'année """
 
         player_id =self.id_joueur
+
+        # Intialisation au dataFrame
         data_result = pd.DataFrame()
 
         if self.sexe == 'H':
@@ -159,95 +158,82 @@ class Joueur:
                             "Donnees/wta_matches_qual_1968_2024.csv"
                             ]
 
-        for indice,fichier in enumerate(liste_fichier) :
+        # Parcours des fichier de matchs
+        for indice,fichier in enumerate(liste_fichier):
 
             # Récupération du fichier
-            data = pd.read_csv(fichier,low_memory=False, index_col=False)
+            data = pd.read_csv(fichier,low_memory=False)
+
+            if annee is not None:
+                # Filtre sur les année
+                data = data[(data['annee'] == annee) & (data['round'] == 'F')].copy()
+            else :
+                data = data[data['round'] == 'F'].copy()
+
             if 'doubles' in fichier :
 
-                # Filtre sur les année
-                data = data[data['annee'] == annee]
-                data = data[data['round'] == 'F']
-
                 # Selection des variables intérets
-                var_interet = ["tourney_date","tourney_name","surface","round",
+                var_interet = ["tourney_date","tourney_name","surface",
                                 'winner1_id','winner2_id']
 
                 data = data[var_interet]
+
                 # selection des ligne ou le joueur à joué
                 mask = ((data['winner1_id'] == player_id) |
                         (data['winner2_id'] == player_id)
                         )
                 data = data[mask]
-                data['resultat'] = 1
-
-                # Type de match : simple ou double
-                data["type"] = 'double'
-
-
-                # Suppression "winner_id" et "loser_id"
-                data = data.drop(columns=['winner1_id','winner2_id'])
-
-                # Ajout au tableau des dataframe
-                data_result = pd.concat([data_result, data], axis=0)
-
-
-            else :
-
-                # Filtre sur les année
-                data = data[data['annee'] == annee]
-                data = data[data['round'] == 'F']
-
-                # Selection des variables intérets
-                data = data[["tourney_date","tourney_name","surface","round",'winner_id']]
-
-                # selection des ligne ou le joueur à joué
-                mask = ((data['winner_id'] == player_id)
-                        )
-                data = data[mask]
-                data['resultat'] = 1
-
-                # Type de match : simple ou double
-                data["type"] = 'simple'
 
                 # Suppression "winner_id"
+                data = data.drop(columns=['winner1_id','winner2_id'])
+
+            else :
+                # Selection des variables intérets
+                data = data[["tourney_date","tourney_name","surface",'winner_id']]
+
+                # selection des ligne ou le joueur à joué
+                mask = ((data['winner_id'] == player_id))
+                data = data[mask]
+
+                # Suppression "winner_id" et "loser_id"
                 data = data.drop(columns=['winner_id'])
 
-                # Ajout au tableau des dataframe
-                data_result = pd.concat([data_result, data], axis=0)
+            if indice == 0:
+                data['type'] = 'simple'
+            elif indice ==1 and self.sexe == 'H':
+                data['type'] = 'double'
+            elif indice == 1:
+                data['type'] = 'qualificatif'
+            elif indice == 2:
+                data['type'] = 'espoir'
+            else: # indice = 3
+                data['type'] = 'qualificatif'
+
+            data_result = pd.concat([data_result, data], axis=0)
+
+        # Rétirer les nom de colonne commencant par 'Unnamed'
+        data_result = data_result.loc[:, ~data.columns.str.startswith('Unnamed')]
+
+        # Réordonner les colonnes
+        # Liste des colonnes dans l'ordre souhaité
+        colonnes_souhaitees = ['tourney_date', 'tourney_name', 'surface', 'type']
+
+        # Réorganiser les colonnes (en gardant seulement celles qui existent dans le DataFrame)
+        colonnes_presentes = [col for col in colonnes_souhaitees if col in data_result.columns]
+        data_result = data_result[colonnes_presentes]
 
         return data_result
 
-    def palmares(self,type):
-        """ type = 1 : match
-            type = 2 : tournoi gagné
-        """
 
-        # Récupération 1er et dernier match
+    def chercher_rang(self):
+
         if self.sexe == 'H':
-            data = pd.read_csv("Donnees/atp_players_comp.csv",low_memory=False)
+            data = pd.read_csv("Donnees/atp_rankings.csv",low_memory=False)
         else :
-            data = pd.read_csv("Donnees/wta_players_comp.csv",low_memory=False)
+            data = pd.read_csv("Donnees/wta_rankings.csv",low_memory=False)
 
-        data_joueur = data[data["player_id"]==self.id_joueur]
-
-        annee_deb = data_joueur["first_match_date"].values[0]
-        annee_deb = datetime.strptime(annee_deb, "%Y-%m-%d").year
-
-        annee_fin = data_joueur["last_match_date"].values[0]
-        annee_fin = datetime.strptime(annee_fin, "%Y-%m-%d").year
-
-        data = pd.DataFrame()
-
-        if type == 1:
-            for annee in range(annee_deb,annee_fin+1,1):
-                data_annee = self.chercher_matchs_annee(annee)
-                data = pd.concat([data, data_annee], axis=0)
-        elif type == 2 :
-            for annee in range(annee_deb,annee_fin+1,1):
-                data_annee = self.chercher_tournoi_annee(annee)
-                data = pd.concat([data, data_annee], axis=0)
-
+        data_rang = data[data["player"] == self.id_joueur]
+        data = data_rang[["ranking_date","rank"]]
 
         return data
 
@@ -321,33 +307,58 @@ def creer_joueur(*,id=None, prenom=None, nom=None):
 
     return joueur
 
-def afficher_tableau1(data):
-    """tourney_date, tourney_level, surface, type, resultat, round_label
+
+def afficher_tableau(data):
+    """Affichage evolutif du dataframe
     """
 
-    # Transformation dde "tourney_date" au format dataframe
-    data['tourney_date'] = pd.to_datetime(data['tourney_date'])
-    data['tourney_date'] = data['tourney_date'].dt.date
+    map_nom = {
+        'tourney_date' : "Date : ",
+        'ranking_date' : "Date : ",
+        'tourney_name' : ". Tournoi : ",
+        'surface' : ", type de surface : ",
+        'type' : ", match ",
+        'resultat' : [". Défaite en ",". Victoire en "],
+        'round_label' : "",
+        'rank' : " rang : ",
+    }
+
+    noms_colonnes = data.columns
+
+    # Classement par date croissante
+    if 'tourney_date' in noms_colonnes:
+        nom = 'tourney_date'
+        # Transformation dde "tourney_date" ou "ranking_date" au format date
+        data[nom] = pd.to_datetime(data[nom])
+        data[nom] = data[nom].dt.date
+    elif 'ranking_date' in noms_colonnes:
+        nom = 'ranking_date'
+        # Transformation dde "tourney_date" ou "ranking_date" au format date
+        data[nom] = pd.to_datetime(data[nom].astype(str), format="%Y%m%d")
+        data[nom] = data[nom].dt.date
+
+    # Rétirer les nom de colonne commencant par 'Unnamed'
+    data = data.loc[:, ~data.columns.str.startswith('Unnamed')]
 
     # Trier dans l'ordre croissant des dates
-    data = data.sort_values('tourney_date')
-
-    # Réindexer proprement
-    data = data.reset_index(drop=True)
+    data = data.sort_values(nom)
 
     # Affichage
     for row in data.itertuples(index = False):  # index=False pour ignorer l'index
-        if row.resultat == 1:
-            print(f"Date : {row.tourney_date}, Tournoi : {row.tourney_name}"
-                f" type de surface : {row.surface} match {row.type}. Victoire en Finale")
-        else:
-            print(f"Date : {row.tourney_date}, Tournoi : {row.tourney_name}"
-                    f" type de surface : {row.surface} match {row.type}. Défaite en {row.round_label}")
+        text = ''
+        for nom in noms_colonnes:
+            if isinstance(map_nom[nom],list):
+                text += map_nom[nom][int(getattr(row,nom))]
+            else:
+                text += map_nom[nom] + str(getattr(row,nom))
+        print(text)
+
+
 
 
 joueur = creer_joueur(id = 104925)
-#tabjoueur = joueur.chercher_matchs_annee(2023)
-#afficher_tableau1(tabjoueur)
+#data = joueur.chercher_matchs()
+#data = joueur.chercher_tournois(2004)
+data = joueur.chercher_rang()
 
-data = joueur.palmares(2)
-afficher_tableau1(data)
+afficher_tableau(data)
