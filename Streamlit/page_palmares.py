@@ -82,7 +82,47 @@ def palmares():
                     else:
                         data = joueur.chercher_matchs()
 
-                    st.write(data)
+                    data = data.sort_values(by='tourney_date', ascending=True)
+
+
+                    # Ajout d'une colonne de sélection (si elle n'existe pas déjà)
+                    if "Sélectionner" not in data.columns:
+                        data["Sélectionner"] = [False] * len(data)
+
+                    # Déplacer la colonne "Sélectionner" en première position
+                    cols = ["Sélectionner"] + [col for col in data.columns if col != "Sélectionner"]
+                    data = data[cols]
+
+                    # Utiliser un data_editor pour afficher la sélection
+                    edited_data = st.data_editor(
+                        data,
+                        use_container_width=True,
+                        key="editor_match",
+                        column_config={
+                            "Sélectionner": st.column_config.CheckboxColumn("Sélectionner", help="Cochez pour voir les détails du match")
+                            },
+                        hide_index=True,
+                        column_order=("Sélectionner", 'tourney_date', 'tourney_name', 'surface', 'type' ,
+                              'resultat', 'round_label') # Optionnel: définir l'ordre des colonnes
+                        )
+
+                    # Trouver les lignes sélectionnées
+                    selected = edited_data[edited_data["Sélectionner"] == True]
+
+                    # Affichage des détails
+                    if len(selected) == 1:
+                        st.subheader("🎾 Détails du match sélectionné")
+                        match = selected.iloc[0]
+                        st.markdown(f"""
+                        - **Gagnant** : {match['Gagnant']}
+                        - **Perdant** : {match['Perdant']}
+                        - **Score final** : {match['score']}
+                        - **Temps** : {match['minutes']}
+                        """)
+                    elif len(selected) > 1:
+                        st.warning("Merci de sélectionner un seul match à la fois.")
+                    else:
+                        st.info("Sélectionnez un match dans le tableau pour voir les détails.")
 
             else:
                 st.write(f"Aucun match renseigné dans la base pour {joueur.nom} {joueur.prenom}")
@@ -94,7 +134,7 @@ def palmares():
             if not pd.isna(joueur.pre_match) and not pd.isna(joueur.der_match):
 
                 annee_debut=pd.to_datetime(joueur.pre_match).year
-                nnee_fin=pd.to_datetime(joueur.der_match).year
+                annee_fin=pd.to_datetime(joueur.der_match).year
 
                 st.write(f"Dans notre base de données le premier match de {joueur.nom}"
                 f" {joueur.prenom} à eu lieu le {joueur.pre_match}, le dernier match à"
@@ -117,15 +157,57 @@ def palmares():
                             key="annee_tournoi"
                             )
 
-                        data = joueur.chercher_tournois(annee_m)
+                        data = joueur.chercher_tournois(annee_t)
 
                     else:
                         data = joueur.chercher_tournois()
 
-                    st.write(data)
 
+                    # Ajout d'une colonne de sélection (si elle n'existe pas déjà)
+                    if "Sélectionner" not in data.columns:
+                        data["Sélectionner"] = [False] * len(data)
+
+                    # Déplacer la colonne "Sélectionner" en première position
+                    cols = ["Sélectionner"] + [col for col in data.columns if col != "Sélectionner"]
+                    data = data[cols]
+
+                    # Utiliser un data_editor pour afficher la sélection
+                    edited_data = st.data_editor(
+                        data,
+                        use_container_width=True,
+                        key="editor_tournoi",
+                        column_config={
+                            "Sélectionner": st.column_config.CheckboxColumn("Sélectionner", help="Cochez pour voir les détails du match")
+                            },
+                        hide_index=True,
+                        column_order=("Sélectionner", 'tourney_date', 'tourney_name', 'surface', 'type' ,
+                              'resultat', 'round_label') # Optionnel: définir l'ordre des colonnes
+                        )
+
+                    # Trouver les lignes sélectionnées
+                    selected = edited_data[edited_data["Sélectionner"] == True]
+
+                    # Affichage des détails
+                    if len(selected) == 1:
+                        st.subheader("🎾 Détails du tournoi sélectionné")
+                        match = selected.iloc[0]
+                        id_tournoi = match['tourney_id']
+                        type = match['type']
+                        data_tournoi = joueur.chercher_parcours_tournois(id_tournoi,type)
+                        for index, match in data_tournoi.iterrows():
+                            st.markdown(f"""
+                            {match['round_label']} contre {match['loser_name']} ({match['loser_ioc']}) de rang {str(int(match['loser_rank']))}.
+                            Score final : {match['score']} en : {str(int(match['minutes']))} minutes.
+                            {str(int(match['w_bpSaved']))} balle(s) de break sauvée(s) sur {str(int(match['w_bpFaced']))}
+                            """)
+
+
+                    elif len(selected) > 1:
+                        st.warning("Merci de sélectionner un seul tournoi à la fois.")
+                    else:
+                        st.info("Sélectionnez un tournoi dans le tableau pour voir les détails.")
             else:
-                st.write(f"Aucun match renseigné dans la base pour {joueur.nom} {joueur.prenom}")
+                st.write(f"Aucun tournoi renseigné dans la base pour {joueur.nom} {joueur.prenom}")
 
     with tab4:
 

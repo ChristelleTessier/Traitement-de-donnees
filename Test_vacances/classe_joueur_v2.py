@@ -18,7 +18,7 @@ class Joueur:
     def chercher_matchs(self,annee =None):
         """ renvois un tableau avec tous les matchs de l'année """
 
-        player_id =self.id_joueur
+        player_id = self.id_joueur
 
         # Intialisation au dataFrame
         data_result = pd.DataFrame()
@@ -36,7 +36,7 @@ class Joueur:
                             ]
 
         # Récupération du dernier match joué par tournoi
-        liste_round_complet = ['R128', 'R64', 'R32', 'R16', 'QS', 'SF', 'F']
+        liste_round_complet = ['R128', 'R64', 'R32', 'R16', 'QF', 'SF', 'F']
 
         liste_mapping  = [ [1,'128ème de finale'], [2,'64ème de finale'] ,
                         [3, '32ème de finale'], [4, '16ème de finale'], [5,'Quart de finale'],
@@ -60,7 +60,11 @@ class Joueur:
 
                 # Selection des variables intérets
                 var_interet = ["tourney_date","tourney_name","surface","round",
-                                'winner1_id','winner2_id',"loser1_id",'loser2_id']
+                                'winner1_id',"winner1_name","winner1_ioc",
+                                'winner2_id',"winner2_name","winner2_ioc",
+                                "loser1_id",'loser1_name',"loser1_ioc",
+                                "loser2_id",'loser2_name',"loser2_ioc",
+                                "score","minutes"]
 
                 data = data[var_interet]
 
@@ -77,12 +81,24 @@ class Joueur:
                 data.loc[data['winner1_id'] == player_id, 'resultat'] = 1
                 data.loc[data['winner2_id'] == player_id, 'resultat'] = 1
 
-                # Suppression "winner_id" et "loser_id"
-                data = data.drop(columns=['winner1_id', 'loser1_id','winner2_id', 'loser2_id'])
+                # Création Gagnant perdant
+                data["Gagnant"] = data["winner1_ioc"] +" : " + data["winner1_name"] + " et " + data["winner2_ioc"] +" : " + data["winner2_name"]
+                data["Perdant"] = data["loser1_ioc"] + " : " + data["loser1_name"] + " et " + data["loser1_ioc"] + " : "+  data["loser2_name"]
+
+                # Suppression des colonnes inutiles
+                data = data.drop(columns=['winner1_id', 'winner1_name', 'winner1_ioc',
+                                         'loser1_id', 'loser1_name', 'loser1_ioc',
+                                         'winner2_id', 'winner2_name', 'winner2_ioc',
+                                         'loser2_id', 'loser2_name', 'loser2_ioc'])
 
             else :
                 # Selection des variables intérets
-                data = data[["tourney_date","tourney_name","surface","round",'winner_id','loser_id']]
+                var_interet = ["tourney_date","tourney_name","surface","round",
+                            'winner_id','winner_name','winner_ioc',
+                            'loser_id','loser_name','loser_ioc',
+                            "score","minutes"]
+
+                data = data[var_interet]
 
                 # selection des ligne ou le joueur à joué
                 mask = ((data['winner_id'] == player_id) |
@@ -94,8 +110,13 @@ class Joueur:
                 data['resultat'] = 0
                 data.loc[data['winner_id'] == player_id, 'resultat'] = 1
 
-                # Suppression "winner_id" et "loser_id"
-                data = data.drop(columns=['winner_id', 'loser_id'])
+                # Création Gagnant perdant
+                data["Gagnant"] = data["winner_ioc"] +" : " + data["winner_name"]
+                data["Perdant"] = data["loser_ioc"] + " : " + data["loser_name"]
+
+                # Suppression des colonnes inutiles
+                data = data.drop(columns=['winner_id', 'winner_name', 'winner_ioc',
+                                         'loser_id', 'loser_name', 'loser_ioc'])
 
             if indice == 0:
                 data['type'] = 'simple'
@@ -128,11 +149,13 @@ class Joueur:
                 data_result = pd.concat([data_result, match_best], axis=0)
 
         # Rétirer les nom de colonne commencant par 'Unnamed'
-        data_result = data_result.loc[:, ~data.columns.str.startswith('Unnamed')]
+        data_result = data_result.loc[:, ~data_result.columns.str.startswith('Unnamed')]
 
         # Réordonner les colonnes
         # Liste des colonnes dans l'ordre souhaité
-        colonnes_souhaitees = ['tourney_date', 'tourney_name', 'surface', 'type' , 'resultat', 'round_label']
+        colonnes_souhaitees = ['tourney_date', 'tourney_name', 'surface', 'type' ,
+                             'resultat', 'round_label',
+                             "Gagnant","Perdant","score","minutes"]
 
         # Réorganiser les colonnes (en gardant seulement celles qui existent dans le DataFrame)
         colonnes_presentes = [col for col in colonnes_souhaitees if col in data_result.columns]
@@ -175,8 +198,12 @@ class Joueur:
             if 'doubles' in fichier :
 
                 # Selection des variables intérets
-                var_interet = ["tourney_date","tourney_name","surface",
-                                'winner1_id','winner2_id']
+                var_interet = ["tourney_id","tourney_date","tourney_name","surface","round",
+                                'winner1_id',"winner1_name","winner1_ioc",
+                                'winner2_id',"winner2_name","winner2_ioc",
+                                'loser1_name',"loser1_ioc",
+                                'loser2_name',"loser2_ioc",
+                                "score","minutes"]
 
                 data = data[var_interet]
 
@@ -186,19 +213,37 @@ class Joueur:
                         )
                 data = data[mask]
 
-                # Suppression "winner_id"
-                data = data.drop(columns=['winner1_id','winner2_id'])
+                # Création Gagnant perdant
+                data["Gagnant"] = data["winner1_ioc"] +" : " + data["winner1_name"] + " et " + data["winner2_ioc"] +" : " + data["winner2_name"]
+                data["Perdant"] = data["loser1_ioc"] + " : " + data["loser1_name"] + " et " + data["loser1_ioc"] + " : "+  data["loser2_name"]
+
+                # Suppression des colonnes inutiles
+                data = data.drop(columns=['winner1_id', 'winner1_name', 'winner1_ioc',
+                                         'loser1_name', 'loser1_ioc',
+                                         'winner2_id', 'winner2_name', 'winner2_ioc',
+                                         'loser2_name', 'loser2_ioc'])
 
             else :
                 # Selection des variables intérets
-                data = data[["tourney_date","tourney_name","surface",'winner_id']]
+                var_interet = ["tourney_id","tourney_date","tourney_name","surface","round",
+                            'winner_id','winner_name','winner_ioc',
+                            'loser_name','loser_ioc',
+                            "score","minutes"]
+
+                data = data[var_interet]
 
                 # selection des ligne ou le joueur à joué
                 mask = ((data['winner_id'] == player_id))
                 data = data[mask]
 
-                # Suppression "winner_id" et "loser_id"
-                data = data.drop(columns=['winner_id'])
+                # Création Gagnant perdant
+                data["Gagnant"] = data["winner_ioc"] +" : " + data["winner_name"]
+                data["Perdant"] = data["loser_ioc"] + " : " + data["loser_name"]
+
+                # Suppression des colonnes inutiles
+                data = data.drop(columns=['winner_id', 'winner_name', 'winner_ioc',
+                                         'loser_name', 'loser_ioc'])
+
 
             if indice == 0:
                 data['type'] = 'simple'
@@ -214,17 +259,69 @@ class Joueur:
             data_result = pd.concat([data_result, data], axis=0)
 
         # Rétirer les nom de colonne commencant par 'Unnamed'
-        data_result = data_result.loc[:, ~data.columns.str.startswith('Unnamed')]
+        data_result = data_result.loc[:, ~data_result.columns.str.startswith('Unnamed')]
 
         # Réordonner les colonnes
         # Liste des colonnes dans l'ordre souhaité
-        colonnes_souhaitees = ['tourney_date', 'tourney_name', 'surface', 'type']
+        colonnes_souhaitees = ["tourney_id",'tourney_date', 'tourney_name', 'surface', 'type' ,
+                             "Gagnant", "Perdant", "score", "minutes"]
 
         # Réorganiser les colonnes (en gardant seulement celles qui existent dans le DataFrame)
         colonnes_presentes = [col for col in colonnes_souhaitees if col in data_result.columns]
         data_result = data_result[colonnes_presentes]
 
         return data_result
+
+    def chercher_parcours_tournois(self,id_tournoi,type):
+
+        sexe = self.sexe
+
+        # Récupération du fichier de données
+        if sexe == 'H':
+            if type == 'simple':
+                data = pd.read_csv("Donnees/atp_matches_1968_2024.csv")
+            elif type == "double":
+                data = pd.read_csv("Donnees/atp_matches_doubles_2000_2024.csv")
+            elif type == "espoir":
+                data = pd.read_csv("Donnees/atp_matches_futures_1992_2024.csv")
+            else:
+                data = pd.read_csv("Donnees/atp_matches_qual_1978_2024.csv")
+        else:
+            if type == 'simple':
+                data = pd.read_csv("Donnees/wta_matches_1968_2024.csv")
+            else:
+                data = pd.read_csv("Donnees/wta_matches_qual_1968_2024.csv")
+
+        # Filtre sur le tournois
+        data = data[data["tourney_id"] == id_tournoi ]
+        data = data[data["winner_id"] == self.id_joueur]
+
+        # Récupération du dernier match joué par tournoi
+        liste_round_complet = ['R128', 'R64', 'R32', 'R16', 'QF', 'SF', 'F']
+
+        liste_mapping  = [ [1,'128ème de finale'], [2,'64ème de finale'] ,
+                        [3, '32ème de finale'], [4, '16ème de finale'], [5,'Quart de finale'],
+                        [6,'Demi-finale'], [7,'Finale'] ]
+
+        # Construire les dictionnaires à partir du mapping
+        round_priority = dict(zip(liste_round_complet, [item[0] for item in liste_mapping]))
+        round_label = dict(zip(liste_round_complet, [item[1] for item in liste_mapping]))
+
+        data["round_priority"] = data["round"].map(round_priority)
+        data["round_label"] = data["round"].map(round_label)
+
+        # Trier par ordre croissant le niveau des matchs
+        data = data.sort_values(by='round_priority', ascending=True)
+
+        # Selection des variables d'intéret
+        data = data[["loser_name",'loser_ioc','score','round','minutes',
+                    'w_bpSaved','w_bpFaced','winner_rank','loser_rank',
+                    'round_label','round_priority']]
+
+
+        return data
+
+
 
 
     def chercher_rang(self):
@@ -255,7 +352,6 @@ def creer_joueur(*,id=None, prenom=None, nom=None):
     Returns:
         Joueur ou None: Un objet Joueur si les informations sont trouvées, sinon None.
     """
-    print("debut recherche")
     if id is None and (prenom is None or nom is None):
         return None
 

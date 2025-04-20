@@ -2,6 +2,7 @@ import streamlit as st
 
 from page_intro import intro
 from page_palmares import palmares
+from page_test import test
 
 
 def main():
@@ -9,6 +10,7 @@ def main():
     pages = {
         "Introduction":intro,
         "Palmares d'un joueur": palmares
+
     }
 
     # Barre latérale avec des boutons radio pour chaque page
