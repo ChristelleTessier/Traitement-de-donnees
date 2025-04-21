@@ -3,6 +3,7 @@ import pandas as pd
 import altair as alt
 import os
 import sys
+import math
 
 # Utiliser le répertoire courant pour Streamlit
 base_path = os.getcwd()
@@ -13,7 +14,55 @@ if test_vacances_path not in sys.path:
     sys.path.append(test_vacances_path)
 
 # Maintenant importer
-from classe_joueur_v2 import Joueur, creer_joueur
+from Test_vacances.classe_joueur_v2 import Joueur, creer_joueur
+
+def afficher_match(match,type):
+
+    # Remplacer les valeurs manquantes par des ?
+    match = match.fillna('?')
+
+    if type == 'double':
+        texte = f"{match['round_label']} {match['winner1_name']} "
+        texte += f"({match['winner1_ioc']}"
+        if match['winner1_rank'] != '?':
+            texte += f", rg : {str(int(match['winner1_rank']))}"
+        texte += f") et {match['winner2_name']} ({match['winner2_ioc']}"
+        if match['winner2_rank'] != '?':
+            texte += f", rg : {str(int(match['winner2_rank']))}"
+        texte += f") contre {match['loser1_name']} ({match['loser1_ioc']}"
+        if match['loser1_rank'] != "?":
+            texte += f", rg : {str(int(match['loser1_rank']))}"
+        texte += f") et {match['loser2_name']} ({match['loser2_ioc']}"
+        if match['loser2_rank'] != '?':
+                texte += f", rg : {str(int(match['loser2_rank']))}"
+        texte += ").\n"
+
+    elif type == 'qualificatif':
+        texte = f"{match['round_label']} {match['winner_name']} "
+        texte += f"({match['winner_ioc']}) "
+        texte += f"contre {match['loser_name']} ({match['loser_ioc']}).\n"
+
+    else :
+        texte = f"{match['round_label']} {match['winner_name']} "
+        texte += f"({match['winner_ioc']}"
+        if match['winner_rank'] != '?':
+            texte += f", rg : {str(int(match['winner_rank']))}"
+        texte += f") contre {match['loser_name']} "
+        texte += f"({match['loser_ioc']}"
+        if match['loser_rank'] != '?':
+            texte += f", rg : {str(int(match['loser_rank']))}"
+        texte += ").\n"
+
+    texte2 = f"Score final : {match['score']}"
+    if match['minutes'] != '?':
+        texte2 += f" en : {str(match['minutes'] // 60)}h et {str(match['minutes'] % 60)} min"
+    texte2 += ".\n"
+    if match['w_bpSaved'] != '?':
+        texte2 += f"{str(int(match['w_bpSaved']))} balle(s) de break sauvée(s) sur "
+        texte2 += f"{str(int(match['w_bpFaced']))}"
+
+    return texte,texte2
+
 
 def palmares():
     st.title("Palmares d'un joueur")
@@ -44,7 +93,14 @@ def palmares():
                 st.write("Le joueur n'a pas été trouvé.")
 
             else:
-                st.write(f"Visitez les onglet suivant pour avoir des informations sur {joueur.nom} {joueur.prenom}")
+                st.write(f"💳 Carte d'identité")
+                st.write(f"""
+                - **Nom :** {joueur.nom}, **prenom :** {joueur.prenom}
+                - **Date de naissance :** {joueur.date_nais}
+                - **Main dominante :** {joueur.main}
+                - **Entrée dans le circuit professionnel :** {joueur.pre_match}
+                - **Dernier match connu :** {joueur.der_match}
+                """)
 
     with tab2:
 
@@ -86,8 +142,13 @@ def palmares():
 
 
                     # Ajout d'une colonne de sélection (si elle n'existe pas déjà)
+                    # if "Sélectionner" not in data.columns:
+                    #    data["Sélectionner"] = [False] * len(data)
+
                     if "Sélectionner" not in data.columns:
-                        data["Sélectionner"] = [False] * len(data)
+                        data["Sélectionner"] = False  # initialise avec False
+                    else:
+                        data["Sélectionner"] = data["Sélectionner"].fillna(0).astype(bool)
 
                     # Déplacer la colonne "Sélectionner" en première position
                     cols = ["Sélectionner"] + [col for col in data.columns if col != "Sélectionner"]
@@ -97,9 +158,9 @@ def palmares():
                     edited_data = st.data_editor(
                         data,
                         use_container_width=True,
-                        key="editor_match",
+                        key="editor_tournoi",
                         column_config={
-                            "Sélectionner": st.column_config.CheckboxColumn("Sélectionner", help="Cochez pour voir les détails du match")
+                            "Sélectionner": st.column_config.CheckboxColumn("Sélectionner", help="Cochez pour voir les détails du tournoi")
                             },
                         hide_index=True,
                         column_order=("Sélectionner", 'tourney_date', 'tourney_name', 'surface', 'type' ,
@@ -109,16 +170,18 @@ def palmares():
                     # Trouver les lignes sélectionnées
                     selected = edited_data[edited_data["Sélectionner"] == True]
 
+
                     # Affichage des détails
                     if len(selected) == 1:
-                        st.subheader("🎾 Détails du match sélectionné")
+                        st.subheader("🎾 Détails du tournoi sélectionné")
                         match = selected.iloc[0]
-                        st.markdown(f"""
-                        - **Gagnant** : {match['Gagnant']}
-                        - **Perdant** : {match['Perdant']}
-                        - **Score final** : {match['score']}
-                        - **Temps** : {match['minutes']}
-                        """)
+                        id_tournoi = match['tourney_id']
+                        type = match['type']
+                        data_tournoi = joueur.chercher_parcours_tournois(id_tournoi,type)
+                        for index, match in data_tournoi.iterrows():
+                            texte, texte2 = afficher_match(match,type)
+                            st.write(texte)
+                            st.write(texte2)
                     elif len(selected) > 1:
                         st.warning("Merci de sélectionner un seul match à la fois.")
                     else:
@@ -162,10 +225,17 @@ def palmares():
                     else:
                         data = joueur.chercher_tournois()
 
+                    data = data.sort_values(by='tourney_date', ascending=True)
+
 
                     # Ajout d'une colonne de sélection (si elle n'existe pas déjà)
+                    # if "Sélectionner" not in data.columns:
+                    #    data["Sélectionner"] = [False] * len(data)
+
                     if "Sélectionner" not in data.columns:
-                        data["Sélectionner"] = [False] * len(data)
+                        data["Sélectionner"] = False  # initialise avec False
+                    else:
+                        data["Sélectionner"] = data["Sélectionner"].fillna(0).astype(bool)
 
                     # Déplacer la colonne "Sélectionner" en première position
                     cols = ["Sélectionner"] + [col for col in data.columns if col != "Sélectionner"]
@@ -175,7 +245,7 @@ def palmares():
                     edited_data = st.data_editor(
                         data,
                         use_container_width=True,
-                        key="editor_tournoi",
+                        key="editor_tournoi_gagné",
                         column_config={
                             "Sélectionner": st.column_config.CheckboxColumn("Sélectionner", help="Cochez pour voir les détails du match")
                             },
@@ -195,11 +265,9 @@ def palmares():
                         type = match['type']
                         data_tournoi = joueur.chercher_parcours_tournois(id_tournoi,type)
                         for index, match in data_tournoi.iterrows():
-                            st.markdown(f"""
-                            {match['round_label']} contre {match['loser_name']} ({match['loser_ioc']}) de rang {str(int(match['loser_rank']))}.
-                            Score final : {match['score']} en : {str(int(match['minutes']))} minutes.
-                            {str(int(match['w_bpSaved']))} balle(s) de break sauvée(s) sur {str(int(match['w_bpFaced']))}
-                            """)
+                            texte, texte2 = afficher_match(match,type)
+                            st.write(texte)
+                            st.write(texte2)
 
 
                     elif len(selected) > 1:
