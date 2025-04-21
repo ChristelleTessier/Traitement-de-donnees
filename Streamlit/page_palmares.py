@@ -14,7 +14,7 @@ if test_vacances_path not in sys.path:
     sys.path.append(test_vacances_path)
 
 # Maintenant importer
-from Test_vacances.classe_joueur_v2 import Joueur, creer_joueur
+from classe_joueur_v2 import Joueur, creer_joueur
 
 def afficher_match(match,type):
 
