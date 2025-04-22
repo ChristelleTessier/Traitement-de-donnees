@@ -1,6 +1,21 @@
 import pandas as pd
 from datetime import datetime
 
+########## A faire ##########
+## Modif __init__
+# A faire après modif atp_players_comp et modif wta_players_comp
+# Ajouter "nb_semaine_..."
+# Ajouter "prop_match_gagne_set1_perdu"
+
+## Créer méthode trouver_adversaire_max10
+# Qui permet de trouver les 10 joueurs les plus rencontré
+
+## Créer méthode trouver_rencontre_joueur(id_advdersaire)
+# Qui permet de trouver les matchs avec un adversaire d'id donné (score, temps, prop balle break sauvé)
+
+## Créer fonction recherche_joueur sans argument
+# Récherche progressive
+
 
 class Joueur:
     def __init__(self, id_joueur : int, prenom  : str, nom : str, sexe : str, date_nais : int, main : str, date1 : int, date2 : int):

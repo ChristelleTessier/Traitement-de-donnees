@@ -2,7 +2,7 @@ import streamlit as st
 
 from page_intro import intro
 from page_palmares import palmares
-#from page_test import test
+
 
 
 def main():
