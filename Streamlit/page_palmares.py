@@ -7,14 +7,14 @@ import math
 
 # Utiliser le répertoire courant pour Streamlit
 base_path = os.getcwd()
-test_vacances_path = os.path.join(base_path, "Test_vacances")
+code_path = os.path.join(base_path, "Code")
 
 # Ajouter au sys.path
-if test_vacances_path not in sys.path:
-    sys.path.append(test_vacances_path)
+if code_path not in sys.path:
+    sys.path.append(code_path)
 
 # Maintenant importer
-from classe_joueur_v2 import Joueur, creer_joueur
+from classe_joueur import Joueur
 
 def afficher_match(match,type):
 
