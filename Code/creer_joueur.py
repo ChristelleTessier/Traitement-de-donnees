@@ -22,8 +22,8 @@ def creer_joueur(*,id=None, prenom=None, nom=None):
         return None
 
     # Chargement des joueurs ATP/WTA
-    data_homme = pd.read_csv("../Donnees/atp_players_comp.csv",low_memory=False)
-    data_femme = pd.read_csv("../Donnees/wta_players_comp.csv",low_memory=False)
+    data_homme = pd.read_csv("Donnees/atp_players_comp.csv",low_memory=False)
+    data_femme = pd.read_csv("Donnees/wta_players_comp.csv",low_memory=False)
 
     ligne_joueur = None
     genre = None

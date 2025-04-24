@@ -5,17 +5,18 @@ import os
 import sys
 import math
 
-# Utiliser le répertoire courant pour Streamlit
-base_path = os.getcwd()
-code_path = os.path.join(base_path, "Code")
+# Récupère le chemin absolu du dossier où se trouve le script streamlit_app.py
+current_dir = os.path.dirname(os.path.abspath(__file__))
+code_path = os.path.abspath(os.path.join(current_dir, "..", "Code"))
 
-# Ajouter au sys.path
+# Ajout au sys.path
 if code_path not in sys.path:
-    sys.path.append(code_path)
+    sys.path.insert(0, code_path)  # Priorité plus haute
 
-# Maintenant importer
+# Ensuite tu fais tes imports
 from classe_joueur import Joueur
 from creer_joueur import creer_joueur
+
 
 def afficher_match(match,type):
 
@@ -134,10 +135,10 @@ def palmares():
                             key="annee_match"
                             )
 
-                        data = joueur.chercher_matchs(annee_m)
+                        data = joueur.chercher_resultat(annee_m)
 
                     else:
-                        data = joueur.chercher_matchs()
+                        data = joueur.chercher_resultat()
 
                     data = data.sort_values(by='tourney_date', ascending=True)
 
@@ -178,7 +179,7 @@ def palmares():
                         match = selected.iloc[0]
                         id_tournoi = match['tourney_id']
                         type = match['type']
-                        data_tournoi = joueur.chercher_parcours_tournois(id_tournoi,type)
+                        data_tournoi = joueur.chercher_parcours_tournoi(id_tournoi,type)
                         for index, match in data_tournoi.iterrows():
                             texte, texte2 = afficher_match(match,type)
                             st.write(texte)
@@ -221,10 +222,10 @@ def palmares():
                             key="annee_tournoi"
                             )
 
-                        data = joueur.chercher_tournois(annee_t)
+                        data = joueur.chercher_tournoi_gagne(annee_t)
 
                     else:
-                        data = joueur.chercher_tournois()
+                        data = joueur.chercher_tournoi_gagne()
 
                     data = data.sort_values(by='tourney_date', ascending=True)
 
@@ -264,7 +265,7 @@ def palmares():
                         match = selected.iloc[0]
                         id_tournoi = match['tourney_id']
                         type = match['type']
-                        data_tournoi = joueur.chercher_parcours_tournois(id_tournoi,type)
+                        data_tournoi = joueur.chercher_parcours_tournoi(id_tournoi,type)
                         for index, match in data_tournoi.iterrows():
                             texte, texte2 = afficher_match(match,type)
                             st.write(texte)
