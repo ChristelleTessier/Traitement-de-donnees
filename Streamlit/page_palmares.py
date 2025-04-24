@@ -15,6 +15,7 @@ if code_path not in sys.path:
 
 # Maintenant importer
 from classe_joueur import Joueur
+from creer_joueur import creer_joueur
 
 def afficher_match(match,type):
 
