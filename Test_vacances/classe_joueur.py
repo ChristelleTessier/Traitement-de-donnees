@@ -238,13 +238,6 @@ class Joueur:
         return data
 
 
-
-
-
-
-
-
-
 def creer_joueur(*,id=None, prenom=None, nom=None):
     """
     Crée un objet Joueur à partir de son ID ou de son prénom et nom.
@@ -260,8 +253,9 @@ def creer_joueur(*,id=None, prenom=None, nom=None):
     Returns:
         Joueur ou None: Un objet Joueur si les informations sont trouvées, sinon None.
     """
-
+    print("debut recherche")
     if id is None and (prenom is None or nom is None):
+        print("pb entrée")
         return None
 
     # Chargement des joueurs ATP/WTA
@@ -274,6 +268,7 @@ def creer_joueur(*,id=None, prenom=None, nom=None):
 
     # Récupération de la bonne ligne
     if id is not None:
+        print("test id")
         if id in data_homme["player_id"].values:
             ligne_joueur = data_homme[data_homme["player_id"] == id]
             genre = "H"
@@ -281,20 +276,27 @@ def creer_joueur(*,id=None, prenom=None, nom=None):
             ligne_joueur = data_femme[data_femme["player_id"] == id]
             genre = "F"
 
-    elif prenom is not None and nom is not None:
+    elif (prenom is not None) and (nom is not None):
         # Recherche chez les hommes
+        print("test")
         ligne_joueur = data_homme[
             (data_homme["name_last"] == nom) & (data_homme["name_first"] == prenom)
         ]
         if not ligne_joueur.empty:
+            print("homme")
             genre = "H"
 
-        # Recherche chez les femmes
-        ligne_joueur = data_femme[
-            (data_femme["name_last"] == nom) & (data_femme["name_first"] == prenom)
-        ]
-        if not ligne_joueur.empty:
-            genre = "F"
+        else:
+            # Recherche chez les femmes
+            ligne_joueur = data_femme[
+                (data_femme["name_last"] == nom) & (data_femme["name_first"] == prenom)
+            ]
+            if not ligne_joueur.empty:
+                print("femme")
+                genre = "F"
+            else:
+                print("pas trouvé")
+
 
     # Création du joueur
     if not ligne_joueur.empty:
@@ -352,13 +354,3 @@ def afficher_tableau(data):
             else:
                 text += map_nom[nom] + str(getattr(row,nom))
         print(text)
-
-
-
-
-joueur = creer_joueur(id = 104925)
-#data = joueur.chercher_matchs()
-#data = joueur.chercher_tournois(2004)
-data = joueur.chercher_rang()
-
-afficher_tableau(data)

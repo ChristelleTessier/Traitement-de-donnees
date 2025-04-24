@@ -165,7 +165,7 @@ class Joueur:
 
         return data_result
 
-    def chercher_tournois(self,annee = None):
+    def chercher_tournois_gagnes(self,annee = None):
         """ renvois un tableau avec tous tournois gagnés de l'année """
 
         player_id =self.id_joueur
