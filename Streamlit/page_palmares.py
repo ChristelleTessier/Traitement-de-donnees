@@ -176,31 +176,95 @@ def afficher_tableau(joueur, data, key_suffix):
             texte, texte2 = texte_afficher_match(match)
             st.write(texte)
             st.write(texte2)
+            st.markdown("<hr>", unsafe_allow_html=True)
 
     elif len(selected) > 1:
         st.warning("Merci de sélectionner un seul élément à la fois.")
     else:
         st.info("Sélectionnez un élément dans le tableau pour voir les détails.")
 
+def appliquer_couleur_ligne(row):
+    # Dictionnaire de correspondance couleur → pastel
+    couleurs_pastel = {
+        'black': '#d6d6d6',
+        'green': '#d0f0c0',
+        'blue': '#cce5ff',
+        'orange': '#ffe5b4'
+    }
 
-def afficher_evolution_rang(joueur):
-    data = joueur.chercher_rang()
-    # data['ranking_date'] = pd.to_datetime(data['ranking_date'].astype(str), format='%Y%m%d')
-    data['ranking_date'] = pd.to_datetime(data['ranking_date'], errors='coerce')
-    data = data.sort_values('ranking_date')
+    couleur = couleurs_pastel.get(row.get("couleur", ""), "#ffffff")  # blanc par défaut
+    return [f"background-color: {couleur}"] * len(row)
 
-    st.write("Évolution du classement au fil du temps")
-    chart = alt.Chart(data).mark_line(point=True).encode(
-        x=alt.X('ranking_date:T', title="Date"),
-        y=alt.Y('rank:Q', title="Classement"),
-        tooltip=['ranking_date:T', 'rank']
-    ).properties(
+def creer_graph_point(data):    
+
+    base = alt.Chart(data).mark_point(filled=True, size=50)
+
+    # Si la colonne "couleur" existe, on l’utilise pour colorier les points
+    if 'couleur' in data.columns:
+        chart = base.encode(
+            x=alt.X('ranking_date:T', title="Date"),
+            y=alt.Y('rank:Q', title="Classement", scale=alt.Scale(reverse=True)),
+            color=alt.Color('couleur:N', scale=None, legend=None),
+            tooltip=['ranking_date:T', 'rank', 'couleur']
+        )
+    else:
+        chart = base.encode(
+            x=alt.X('ranking_date:T', title="Date"),
+            y=alt.Y('rank:Q', title="Classement", scale=alt.Scale(reverse=True)),
+            tooltip=['ranking_date:T', 'rank']
+        )
+
+    chart = chart.properties(
         width=700,
         height=400,
         title="Évolution du rang du joueur"
     ).interactive()
+
+    return chart
+
+
+def afficher_evolution_rang_generale(joueur):
+    data = joueur.chercher_rang()
+    # data['ranking_date'] = pd.to_datetime(data['ranking_date'].astype(str), format='%Y%m%d')
+    data['ranking_date'] = pd.to_datetime(data['ranking_date'], errors='coerce').dt.date
+    data = data.sort_values('ranking_date')
+
+    # Créer une nouvelle colonne "segment_color" qui définit la couleur de chaque segment
+    data['couleur'] = 'orange'  # Valeur par défaut
+    data.loc[data['rank'] <= 10, 'couleur'] = 'black'  # Rangs entre 1 et 10 (noir)
+    data.loc[(data['rank'] > 10) & (data['rank'] <= 50), 'couleur'] = 'green'  # Rangs entre 11 et 50 (bleu)
+    data.loc[(data['rank'] > 50) & (data['rank'] <= 100), 'couleur'] = 'blue'  # Rangs entre 51 et 100 (vert)
+
+    st.write("Évolution du classement au fil du temps")
+    
+    chart = creer_graph_point(data)
+
+    # Affichage du graphique dans Streamlit
     st.altair_chart(chart, use_container_width=True)
-    st.write(data)
+
+    st.markdown("<hr>", unsafe_allow_html=True)
+
+    # Filtrer les rangs entre 1 et 100 (inclus)
+    data_red = data[(data['rank'] >= 1) & (data['rank'] <= 100)]
+
+    st.write("Évolution du classement dans le top 100 au fil du temps")
+
+    color=alt.Color('couleur:N', scale=None, legend=None)
+    chart_red = creer_graph_point(data_red)
+
+    # Affichage du graphique dans Streamlit
+    st.altair_chart(chart_red, use_container_width=True)
+
+    # Applique la coloration ligne par ligne
+    styled_df = data.style.apply(appliquer_couleur_ligne, axis=1)
+
+    # Afficher le tableau avec les couleurs pastel
+    st.dataframe(styled_df, use_container_width=True)
+
+    
+
+
+
 
 
 def palmares():
@@ -213,8 +277,6 @@ def palmares():
         joueur = verifier_et_creer_joueur(nom_j, prenom_j)
 
     if joueur:
-        annee_debut = pd.to_datetime(joueur.pre_match).year
-        annee_fin = pd.to_datetime(joueur.der_match).year
 
         with tab2:
             st.write(f"Premier match : {joueur.pre_match}, dernier : {joueur.der_match}")
@@ -229,4 +291,4 @@ def palmares():
             afficher_tableau(joueur, data, "tournoi_gagne")
 
         with tab4:
-            afficher_evolution_rang(joueur)
+            afficher_evolution_rang_generale(joueur)
