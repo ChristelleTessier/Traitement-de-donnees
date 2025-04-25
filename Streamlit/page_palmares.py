@@ -66,30 +66,85 @@ def texte_afficher_match(match):
 
     return texte,texte2
 
-def selection_donnees_par_annee(joueur, debut, fin, fonction_cherche, cle_annee):
-    """ Choisir la modalité parcours/tournois annee/carrière tournoi_level """
-    choix = st.radio(
-        "Sélection des données :",
-        ("Sur une année précise", "Carrière complete"),
-        key=f"choix_{cle_annee}")
 
-    if choix == "Sur une année précise":
-        annee = st.number_input(
-            f"Saisir l'année désirée entre {debut} et {fin}",
-            min_value=debut,
-            max_value=fin,
-            step=1,
-            format="%d",
-            key=cle_annee
+def choix_parametre(joueur,data, cle):
+    # Créer une liste pour stocker les valeurs sélectionnées
+    param = [None, None, None]
+
+    # Selection des années    
+    annee_debut = pd.to_datetime(joueur.pre_match).year
+    annee_fin = pd.to_datetime(joueur.der_match).year
+
+    # Créer une liste des années entre annee_debut et annee_fin
+    annees = list(range(annee_debut, annee_fin + 1))
+
+    # Utiliser un menu déroulant avec multiselect pour permettre à l'utilisateur de choisir plusieurs années
+    annees_selectionnees = st.multiselect(
+        "Sélectionner les années",
+        options=annees,
+        default=annees,  # Par défaut, toutes les années sont sélectionnées
+        key="unique_key_annees" + cle
         )
-        data = fonction_cherche(annee)
-    else:
-        data = fonction_cherche()
 
+    param[0] = annees_selectionnees
+
+    # Selection des niveau de tournoi
+    liste_level = data['tourney_level'].unique()
+
+    # Utiliser un menu déroulant avec multiselect pour permettre à l'utilisateur de choisir plusieurs niveaux
+    levels_selectionnes = st.multiselect(
+        "Sélectionner les niveaux",
+        options=liste_level,
+        default=liste_level,  # Par défaut, tous les niveaux sont sélectionnés
+        key="unique_key_levels" + cle
+    )
+
+    param[1] = levels_selectionnes
+
+    # Selection surfaces
+    liste_surface = data['surface'].unique()
+
+    # Utiliser un menu déroulant avec multiselect pour permettre à l'utilisateur de choisir plusieurs niveaux
+    surface_selectionnes = st.multiselect(
+        "Sélectionner les niveaux",
+        options=liste_surface,
+        default=liste_surface,  # Par défaut, tous les niveaux sont sélectionnés
+        key="unique_key_surfaces" + cle
+    )
+
+    param[2] = surface_selectionnes
+
+    return param
+
+
+
+# Fonction de sélection des données par année
+def selection_tableau(joueur, fonction_cherche, cle):
+    """ Choisir la modalité parcours/tournois année/carrière tournoi_level """
+    
+    data = fonction_cherche()
+
+    # Demander à l'utilisateur s'il veut fixer des paramètres
+    fix_parametres = st.radio(
+        "Souhaitez-vous fixer des paramètres ?",
+        ("Oui", "Non"),
+        index=1, # Pour fixer a non
+        key=f"fix_param_{cle}"
+    )
+
+    # Si l'utilisateur veut fixer des paramètres
+    if fix_parametres == "Oui":
+        # Appel à la fonction choisir_parametre pour récupérer les nouvelles années
+        param = choix_parametre(joueur,data,cle)
+
+        # Appel de la fonction de recherche avec les nouvelles années
+        data = fonction_cherche(*param)
+    
     return data.sort_values(by='tourney_date', ascending=True)
 
 
-def afficher_details_parcours(joueur, data, key_suffix):
+
+def afficher_tableau(joueur, data, key_suffix):
     """ Afficher tableau du parcours/ tournois """
 
     if "Sélectionner" not in data.columns:
@@ -163,13 +218,15 @@ def palmares():
 
         with tab2:
             st.write(f"Premier match : {joueur.pre_match}, dernier : {joueur.der_match}")
-            data = selection_donnees_par_annee(joueur, annee_debut, annee_fin, joueur.chercher_resultat, "annee_match")
-            afficher_details_parcours(joueur, data, "match")
+                      
+            data = selection_tableau(joueur,joueur.chercher_resultat, "match")
+            afficher_tableau(joueur, data, "match")
 
         with tab3:
             st.write(f"Premier match : {joueur.pre_match}, dernier : {joueur.der_match}")
-            data = selection_donnees_par_annee(joueur, annee_debut, annee_fin, joueur.chercher_tournoi_gagne, "annee_tournoi")
-            afficher_details_parcours(joueur, data, "tournoi_gagne")
+
+            data = selection_tableau(joueur,joueur.chercher_tournoi_gagne, "tournoi")
+            afficher_tableau(joueur, data, "tournoi_gagne")
 
         with tab4:
             afficher_evolution_rang(joueur)

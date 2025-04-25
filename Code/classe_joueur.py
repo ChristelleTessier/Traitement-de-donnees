@@ -35,7 +35,7 @@ class Joueur:
         texte += f"carrière de {self.pre_match} à {self.der_match}"
         return texte
 
-    def chercher_resultat(self,annee = None, levels = None):
+    def chercher_resultat(self,annees = None, levels = None, surfaces = None):
 
         """ renvois un tableau avec tous les matchs de l'année / ou de la carrière """
 
@@ -65,9 +65,13 @@ class Joueur:
 
             # Restriction du DataFrame si necessaire
             ####################################################
-            if annee is not None:
-                # Filtre sur les année
-                data = data[data['annee'] == annee]
+            if annees is not None:
+                # Filtre sur les années
+                data_restriction = pd.DataFrame()
+                for annee in annees:
+                    data_temp =data[data['annee'] == annee]
+                    data_restriction = pd.concat([data_restriction, data_temp], axis=0)
+                data = data_restriction.copy()
 
             if levels is not None:
                 # Filtre sur les level de tournoi
@@ -76,6 +80,15 @@ class Joueur:
                     data_temp =data[data['tourney_level'] == level]
                     data_restriction = pd.concat([data_restriction, data_temp], axis=0)
                 data = data_restriction.copy()
+
+            if surfaces is not None:
+                # Filtre sur les surfaces
+                data_restriction = pd.DataFrame()
+                for surface in surfaces:
+                    data_temp =data[data['surface'] == surface]
+                    data_restriction = pd.concat([data_restriction, data_temp], axis=0)
+                data = data_restriction.copy()
+
 
 
             # Selection des variables intérets
@@ -177,7 +190,7 @@ class Joueur:
         return data_result
 
 
-    def chercher_tournoi_gagne(self,annee = None, levels = None):
+    def chercher_tournoi_gagne(self,annees = None, levels = None, surfaces = None):
         """ renvois un tableau avec tous les matchs de l'année / ou de la carrière """
 
         player_id = self.id_joueur
@@ -206,15 +219,27 @@ class Joueur:
 
             # Restriction du DataFrame si necessaire
             ####################################################
-            if annee is not None:
-                # Filtre sur les année
-                data = data[data['annee'] == annee]
+            if annees is not None:
+                # Filtre sur les années
+                data_restriction = pd.DataFrame()
+                for annee in annees:
+                    data_temp =data[data['annee'] == annee]
+                    data_restriction = pd.concat([data_restriction, data_temp], axis=0)
+                data = data_restriction.copy()
 
             if levels is not None:
                 # Filtre sur les level de tournoi
                 data_restriction = pd.DataFrame()
                 for level in levels:
                     data_temp =data[data['tourney_level'] == level]
+                    data_restriction = pd.concat([data_restriction, data_temp], axis=0)
+                data = data_restriction.copy()
+
+            if surfaces is not None:
+                # Filtre sur les surfaces
+                data_restriction = pd.DataFrame()
+                for surface in surfaces:
+                    data_temp =data[data['surface'] == surface]
                     data_restriction = pd.concat([data_restriction, data_temp], axis=0)
                 data = data_restriction.copy()
 
