@@ -66,7 +66,7 @@ def creer_joueur(*,id=None, prenom=None, nom=None):
                             sexe = genre,
                             date_nais = ligne_joueur['dob'].values[0],
                             main = ligne_joueur['hand'].values[0],
-                            nb_tournois_joue = ligne_joueur['nb_tournois_joue'].value[0],
+                            nb_tournois_joue = ligne_joueur['nb_tournois_joue'].values[0],
                             nb_tournois_gagne = ligne_joueur['nb_tournois_gagne'].values[0],
                             prop_vic_set_1_perdu = ligne_joueur["prop_vic_set_1_perdu"].values[0],
                             prop_balle_break_sauvee = ligne_joueur["prop_balle_break_sauvee"].values[0],
