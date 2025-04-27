@@ -32,8 +32,8 @@ def verifier_et_creer_joueur(nom_j, prenom_j):
             - **Nom :** {joueur.nom}, **prenom :** {joueur.prenom}
             - **Date de naissance :** {joueur.date_nais}
             - **Main dominante :** {joueur.main}
-            - **Nombre de tournois joué :** {joueur.nb_tournoi_joue}
-            - **Nombre de tournois gagné :** {joueur.nb_tournoi_gagne}
+            - **Nombre de tournois joué :** {joueur.nb_tournois_joue}
+            - **Nombre de tournois gagné :** {joueur.nb_tournois_gagne}
             - **Proportion de match gagné en ayant perdu le 1er set :** {joueur.prop_vic_set_1_perdu}
             - **Proportion de balle de break sauvée :** {joueur.prop_balle_break_sauvee}
             - **Nombre de semaine classé :** {joueur.nb_sem_classe}

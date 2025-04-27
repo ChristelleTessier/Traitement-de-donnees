@@ -19,7 +19,7 @@ from datetime import datetime
 
 class Joueur:
     def __init__(self, id_joueur : int, prenom  : str, nom : str, sexe : str,
-                  date_nais : datetime, main : str, nb_tournoi_joue : int, nb_tournoi_gagne :int,
+                  date_nais : datetime, main : str, nb_tournois_joue : int, nb_tournois_gagne :int,
                   prop_vic_set_1_perdu : float, prop_balle_break_sauvee : float, nb_sem_classe : int,
                   nb_sem_1_10 : int, nb_sem_11_50 : int, nb_sem_51_100 : int,
                   date1 : datetime, date2 : datetime):
@@ -29,8 +29,8 @@ class Joueur:
         self.sexe = sexe
         self.date_nais = date_nais
         self.main = main
-        self.nb_tournoi_joue = nb_tournoi_joue
-        self.nb_tournoi_gagne = nb_tournoi_gagne
+        self.nb_tournois_joue = nb_tournois_joue
+        self.nb_tournois_gagne = nb_tournois_gagne
         self.prop_vic_set_1_perdu = prop_vic_set_1_perdu
         self.prop_balle_break_sauvee = prop_balle_break_sauvee
         self.nb_sem_classe = nb_sem_classe
