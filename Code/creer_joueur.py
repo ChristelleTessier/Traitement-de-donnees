@@ -22,8 +22,8 @@ def creer_joueur(*,id=None, prenom=None, nom=None):
         return None
 
     # Chargement des joueurs ATP/WTA
-    data_homme = pd.read_csv("Donnees/atp_players_comp.csv",low_memory=False)
-    data_femme = pd.read_csv("Donnees/wta_players_comp.csv",low_memory=False)
+    data_homme = pd.read_csv("Donnees/atp_players.csv",low_memory=False)
+    data_femme = pd.read_csv("Donnees/wta_players.csv",low_memory=False)
 
     ligne_joueur = None
     genre = None
@@ -66,6 +66,14 @@ def creer_joueur(*,id=None, prenom=None, nom=None):
                             sexe = genre,
                             date_nais = ligne_joueur['dob'].values[0],
                             main = ligne_joueur['hand'].values[0],
+                            nb_tournoi_joue = ligne_joueur['nb_tournoi_joue'].value[0],
+                            nb_tournoi_gagne = ligne_joueur['nb_tournoi_gagne'].values[0],
+                            prop_vic_set_1_perdu = ligne_joueur["prop_vic_set_1_perdu"].values[0],
+                            prop_balle_break_sauvee = ligne_joueur["prop_balle_break_sauvee"].values[0],
+                            nb_sem_classe = ligne_joueur["nb_sem_classe"].values[0],
+                            nb_sem_1_10 = ligne_joueur["nb_sem_1_10"].values[0],
+                            nb_sem_11_50 = ligne_joueur["nb_sem_11_50"].values[0],
+                            nb_sem_51_100 = ligne_joueur["nb_sem_51_100"].values[0],
                             date1 = ligne_joueur['first_match_date'].values[0],
                             date2 = ligne_joueur['last_match_date'].values[0])
 

@@ -19,13 +19,24 @@ from datetime import datetime
 
 class Joueur:
     def __init__(self, id_joueur : int, prenom  : str, nom : str, sexe : str,
-                  date_nais : datetime, main : str, date1 : datetime, date2 : datetime):
+                  date_nais : datetime, main : str, nb_tournoi_joue : int, nb_tournoi_gagne :int,
+                  prop_vic_set_1_perdu : float, prop_balle_break_sauvee : float, nb_sem_classe : int,
+                  nb_sem_1_10 : int, nb_sem_11_50 : int, nb_sem_51_100 : int,
+                  date1 : datetime, date2 : datetime):
         self.id_joueur = id_joueur
         self.prenom = prenom
         self.nom = nom
         self.sexe = sexe
         self.date_nais = date_nais
         self.main = main
+        self.nb_tournoi_joue = nb_tournoi_joue
+        self.nb_tournoi_gagne = nb_tournoi_gagne
+        self.prop_vic_set_1_perdu = prop_vic_set_1_perdu
+        self.prop_balle_break_sauvee = prop_balle_break_sauvee
+        self.nb_sem_classe = nb_sem_classe
+        self.nb_sem_1_10 = nb_sem_1_10
+        self.nb_sem_11_50 = nb_sem_11_50
+        self.nb_sem_51_100 = nb_sem_51_100
         self.pre_match = date1
         self.der_match = date2
 
@@ -342,6 +353,9 @@ class Joueur:
         data = data[var_interet]
 
         return data
+
+    def cherche_10_joueur(self):
+        pass
 
     def chercher_match_adversaire(self, id_joueur):
 

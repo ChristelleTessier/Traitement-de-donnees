@@ -32,6 +32,14 @@ def verifier_et_creer_joueur(nom_j, prenom_j):
             - **Nom :** {joueur.nom}, **prenom :** {joueur.prenom}
             - **Date de naissance :** {joueur.date_nais}
             - **Main dominante :** {joueur.main}
+            - **Nombre de tournois joué :** {joueur.nb_tournoi_joue}
+            - **Nombre de tournois gagné :** {joueur.nb_tournoi_gagne}
+            - **Proportion de match gagné en ayant perdu le 1er set :** {joueur.prop_vic_set_1_perdu}
+            - **Proportion de balle de break sauvée :** {joueur.prop_balle_break_sauvee}
+            - **Nombre de semaine classé :** {joueur.nb_sem_classe}
+            - **Nombre de semaine resté au top 10 :** {joueur.nb_sem_1_10}
+            - **Nombre de semaine resté au top 50 :** {joueur.nb_sem_11_50}
+            - **Nombre de semaine resté au top 100 :** {joueur.nb_sem_51_100}
             - **Entrée dans le circuit professionnel :** {joueur.pre_match}
             - **Dernier match connu :** {joueur.der_match}
             """)
@@ -71,7 +79,7 @@ def choix_parametre(joueur,data, cle):
     # Créer une liste pour stocker les valeurs sélectionnées
     param = [None, None, None]
 
-    # Selection des années    
+    # Selection des années
     annee_debut = pd.to_datetime(joueur.pre_match).year
     annee_fin = pd.to_datetime(joueur.der_match).year
 
@@ -121,7 +129,7 @@ def choix_parametre(joueur,data, cle):
 # Fonction de sélection des données par année
 def selection_tableau(joueur, fonction_cherche, cle):
     """ Choisir la modalité parcours/tournois année/carrière tournoi_level """
-    
+
     data = fonction_cherche()
 
     # Demander à l'utilisateur s'il veut fixer des paramètres
@@ -139,7 +147,7 @@ def selection_tableau(joueur, fonction_cherche, cle):
 
         # Appel de la fonction de recherche avec les nouvelles années
         data = fonction_cherche(*param)
-    
+
     return data.sort_values(by='tourney_date', ascending=True)
 
 
@@ -195,7 +203,7 @@ def appliquer_couleur_ligne(row):
     couleur = couleurs_pastel.get(row.get("couleur", ""), "#ffffff")  # blanc par défaut
     return [f"background-color: {couleur}"] * len(row)
 
-def creer_graph_point(data):    
+def creer_graph_point(data):
 
     base = alt.Chart(data).mark_point(filled=True, size=50)
 
@@ -236,7 +244,7 @@ def afficher_evolution_rang_generale(joueur):
     data.loc[(data['rank'] > 50) & (data['rank'] <= 100), 'couleur'] = 'blue'  # Rangs entre 51 et 100 (vert)
 
     st.write("Évolution du classement au fil du temps")
-    
+
     chart = creer_graph_point(data)
 
     # Affichage du graphique dans Streamlit
@@ -261,7 +269,7 @@ def afficher_evolution_rang_generale(joueur):
     # Afficher le tableau avec les couleurs pastel
     st.dataframe(styled_df, use_container_width=True)
 
-    
+
 
 
 
@@ -280,7 +288,7 @@ def palmares():
 
         with tab2:
             st.write(f"Premier match : {joueur.pre_match}, dernier : {joueur.der_match}")
-                      
+
             data = selection_tableau(joueur,joueur.chercher_resultat, "match")
             afficher_tableau(joueur, data, "match")
 
