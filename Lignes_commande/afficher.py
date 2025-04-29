@@ -1,0 +1,100 @@
+import os
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+import pandas as pd
+
+
+
+
+def afficher_joueur(joueur):
+    if joueur is None:
+        print("❌ Joueur non trouvé.")
+    else:
+        print("\n✅ Joueur trouvé :")
+        print(f"Nom : {joueur.prenom} {joueur.nom}")
+        print(f"Sexe : {joueur.sexe}")
+        print(f"Date de naissance : {joueur.date_nais}")
+        print(f"Main : {joueur.main}")
+        print(f"Nombre de tournois joués : {joueur.nb_tournois_joue}")
+        print(f"Nombre de tournois gagnés : {joueur.nb_tournois_gagne}")
+        print(f"Proportion victoires après set 1 perdu : {round(joueur.prop_vic_set_1_perdu,2)} %")
+        print(f"Proportion balles de break sauvées : {round(joueur.prop_balle_break_sauvee,2)} %")
+        print(f"Nombre de semaines classé : {joueur.nb_sem_classe}")
+        print(f"Nombre de semaines 1-10 : {joueur.nb_sem_1_10}")
+        print(f"Nombre de semaines 11-50 : {joueur.nb_sem_11_50}")
+        print(f"Nombre de semaines 51-100 : {joueur.nb_sem_51_100}")
+        print(f"Premier match : {joueur.pre_match}")
+        print(f"Dernier match : {joueur.der_match}")
+
+    input("\nAppuie sur Entrée pour continuer")
+
+def afficher_tournoi(data, lignes_par_page = 25 ):
+    os.system('cls')
+    n = len(data)
+    for i in range(0, n, lignes_par_page):
+        print(data.iloc[i:i+lignes_par_page].to_string(index=False))
+        if i + lignes_par_page < n:
+            input("\nAppuie sur Entrée pour voir la suite...")
+
+def afficher_matchs(data):
+    for index, row in data.iterrows():
+        print(f'{row["round_label"]} : Victoire de {row["winner_name"]} contre {row["loser_name"]}'
+              f', score de {row["score"]}')
+
+def afficher_matchs_rencontre(data, lignes_par_page=25):
+    os.system('cls')
+    n = len(data)
+
+    for i in range(0, n, lignes_par_page):
+        page = data.iloc[i:i + lignes_par_page]
+        for index, row in page.iterrows():
+            print(
+                f"📅 {row['tourney_date']} - 🎾 Tournoi de {row['tourney_name']}, "
+                f"🌀 Round : {row['round']}\n"
+                f"🏆 Victoire de {row['winner_name']} contre {row['loser_name']}, "
+                f"📊 Score : {row['score']}\n"
+            )
+        if i + lignes_par_page < n:
+            input("Appuie sur Entrée pour voir la suite...")
+            os.system('cls' if os.name == 'nt' else 'clear')
+
+
+def afficher_nuage_point(data):
+    # Conversion de la colonne 'ranking_date' en datetime
+    data['ranking_date'] = pd.to_datetime(data['ranking_date'])
+
+    plt.figure(figsize=(10, 6))  # pour un affichage plus propre
+
+    # Définir les tranches de rangs et leurs couleurs
+    conditions = [
+        (data["rank"] >= 1) & (data["rank"] <= 10),
+        (data["rank"] >= 11) & (data["rank"] <= 50),
+        (data["rank"] >= 51) & (data["rank"] <= 100),
+        (data["rank"] > 100)
+    ]
+    couleurs = ['black', 'green', 'blue', 'orange']
+    labels = ['Top 10', '11-50', '51-100', 'Au-delà de 100']
+
+    # Tracer chaque groupe avec sa couleur
+    for condition, couleur, label in zip(conditions, couleurs, labels):
+        subset = data[condition]
+        plt.scatter(subset['ranking_date'], subset['rank'], color=couleur, label=label, s=10)
+
+    plt.title("Nuage de points : Classement par Date")
+    plt.xlabel("Année")
+    plt.ylabel("Classement")
+
+    # Inverser l'axe Y (meilleur rang en haut)
+    plt.gca().invert_yaxis()
+
+    # Formater l'axe X pour n'afficher que l'année
+    ax = plt.gca()
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))  # %Y = année seulement
+    ax.xaxis.set_major_locator(mdates.YearLocator())  # 1 graduation par an
+
+    plt.gcf().autofmt_xdate()  # ajuste la rotation des labels
+
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+    plt.show()

@@ -104,7 +104,7 @@ class Joueur:
 
             # Selection des variables intérets
             ####################################################
-            var_interet = ['tourney_id',"tourney_date","tourney_name", 'tourney_level',
+            var_interet = ['annee','tourney_id',"tourney_date","tourney_name", 'tourney_level',
                             "surface","round",'winner_id','loser_id']
 
             data = data[var_interet]
@@ -148,7 +148,7 @@ class Joueur:
                 rounds = data_tournoi["round"].unique()
 
                 # Type de tournois
-                ####################################################
+                            ####################################################
 
                 # Tournoi au Round Robin
                 if 'RR' in rounds:
@@ -191,7 +191,7 @@ class Joueur:
 
         # Réordonner les colonnes
         # Liste des colonnes dans l'ordre souhaité
-        colonnes_souhaitees = ['tourney_id','tourney_date', 'tourney_name', 'tourney_level',
+        colonnes_souhaitees = ['annee','tourney_id','tourney_date', 'tourney_name', 'tourney_level',
                                 'surface', 'type' , 'resultat', 'round_label']
 
         # Réorganiser les colonnes (en gardant seulement celles qui existent dans le DataFrame)
@@ -259,7 +259,7 @@ class Joueur:
 
             # Selection des variables intérets
             ####################################################
-            var_interet = ['tourney_id',"tourney_date","tourney_name", 'tourney_level',
+            var_interet = ['annee','tourney_id',"tourney_date","tourney_name", 'tourney_level',
                             "surface"]
 
             data = data[var_interet]
@@ -281,7 +281,7 @@ class Joueur:
 
         # Réordonner les colonnes
         # Liste des colonnes dans l'ordre souhaité
-        colonnes_souhaitees = ['tourney_id','tourney_date', 'tourney_name', 'tourney_level',
+        colonnes_souhaitees = ['annee','tourney_id','tourney_date', 'tourney_name', 'tourney_level',
                                 'surface', 'type' ]
 
         # Réorganiser les colonnes (en gardant seulement celles qui existent dans le DataFrame)
@@ -346,7 +346,7 @@ class Joueur:
         # Trier par ordre croissant le niveau des matchs
         data = data.sort_values(by='round_priority', ascending=False)
 
-        var_interet = ["winner_name","loser_name","winner_ioc",'loser_ioc',
+        var_interet = ['annee',"winner_name","loser_name","winner_ioc",'loser_ioc',
                         "winner_rank","loser_rank",'round_label','round_priority',
                         'score','round','minutes',
                         'w_bpSaved','w_bpFaced','l_bpSaved','l_bpFaced']
@@ -355,7 +355,8 @@ class Joueur:
         return data
 
     def cherche_10_joueur(self):
-        pass
+
+        return None
 
     def chercher_match_adversaire(self, id_joueur):
 
