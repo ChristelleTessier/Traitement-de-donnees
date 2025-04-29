@@ -53,14 +53,14 @@ class Joueur:
         player_id = self.id_joueur
 
         if self.sexe == 'H':
-            liste_fichier = ["Donnees/atp_matches_1968_2024.csv",
-                            "Donnees/atp_matches_futures_1992_2024.csv",
-                            "Donnees/atp_matches_qual_1978_2024.csv"
+            liste_fichier = ["../Donnees/atp_matches_1968_2024.csv",
+                            "../Donnees/atp_matches_futures_1992_2024.csv",
+                            "../Donnees/atp_matches_qual_1978_2024.csv"
                             ]
 
         else :
-            liste_fichier = ["Donnees/wta_matches_1968_2024.csv",
-                            "Donnees/wta_matches_qual_1968_2024.csv"
+            liste_fichier = ["../Donnees/wta_matches_1968_2024.csv",
+                            "../Donnees/wta_matches_qual_1968_2024.csv"
                             ]
 
 
@@ -207,14 +207,14 @@ class Joueur:
         player_id = self.id_joueur
 
         if self.sexe == 'H':
-            liste_fichier = ["Donnees/atp_matches_1968_2024.csv",
-                            "Donnees/atp_matches_futures_1992_2024.csv",
-                            "Donnees/atp_matches_qual_1978_2024.csv"
+            liste_fichier = ["../Donnees/atp_matches_1968_2024.csv",
+                            "../Donnees/atp_matches_futures_1992_2024.csv",
+                            "../Donnees/atp_matches_qual_1978_2024.csv"
                             ]
 
         else :
-            liste_fichier = ["Donnees/wta_matches_1968_2024.csv",
-                            "Donnees/wta_matches_qual_1968_2024.csv"
+            liste_fichier = ["../Donnees/wta_matches_1968_2024.csv",
+                            "../Donnees/wta_matches_qual_1968_2024.csv"
                             ]
 
 
@@ -297,16 +297,16 @@ class Joueur:
         # Récupération du fichier de données
         if sexe == 'H':
             if type == 'simple':
-                data = pd.read_csv("Donnees/atp_matches_1968_2024.csv")
+                data = pd.read_csv("../Donnees/atp_matches_1968_2024.csv")
             elif type == "espoir":
-                data = pd.read_csv("Donnees/atp_matches_futures_1992_2024.csv")
+                data = pd.read_csv("../Donnees/atp_matches_futures_1992_2024.csv")
             else:
-                data = pd.read_csv("Donnees/atp_matches_qual_1978_2024.csv")
+                data = pd.read_csv("../Donnees/atp_matches_qual_1978_2024.csv")
         else:
             if type == 'simple':
-                data = pd.read_csv("Donnees/wta_matches_1968_2024.csv")
+                data = pd.read_csv("../Donnees/wta_matches_1968_2024.csv")
             else:
-                data = pd.read_csv("Donnees/wta_matches_qual_1968_2024.csv")
+                data = pd.read_csv("../Donnees/wta_matches_qual_1968_2024.csv")
 
         data = data[data['tourney_id'] == id_tournoi]
         data = data[(data["winner_id"] == self.id_joueur) | (data["loser_id"] == self.id_joueur) ]
@@ -366,14 +366,14 @@ class Joueur:
         data_result = pd.DataFrame()
 
         if self.sexe == 'H':
-            liste_fichier = ["Donnees/atp_matches_1968_2024.csv",
-                            "Donnees/atp_matches_futures_1992_2024.csv",
+            liste_fichier = ["../Donnees/atp_matches_1968_2024.csv",
+                            "../Donnees/atp_matches_futures_1992_2024.csv",
                             "Donnees/atp_matches_qual_1978_2024.csv"
                             ]
 
         else :
-            liste_fichier = ["Donnees/wta_matches_1968_2024.csv",
-                            "Donnees/wta_matches_qual_1968_2024.csv"
+            liste_fichier = ["../Donnees/wta_matches_1968_2024.csv",
+                            "../Donnees/wta_matches_qual_1968_2024.csv"
                             ]
 
         # Parcours des fichier de matchs

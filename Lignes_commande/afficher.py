@@ -29,7 +29,6 @@ def afficher_joueur(joueur):
     input("\nAppuie sur Entrée pour continuer")
 
 def afficher_tournoi(data, lignes_par_page = 25 ):
-    os.system('cls')
     n = len(data)
     for i in range(0, n, lignes_par_page):
         print(data.iloc[i:i+lignes_par_page].to_string(index=False))
@@ -42,7 +41,6 @@ def afficher_matchs(data):
               f', score de {row["score"]}')
 
 def afficher_matchs_rencontre(data, lignes_par_page=25):
-    os.system('cls')
     n = len(data)
 
     for i in range(0, n, lignes_par_page):
@@ -95,6 +93,34 @@ def afficher_nuage_point(data):
     plt.gcf().autofmt_xdate()  # ajuste la rotation des labels
 
     plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
+def afficher_nuage_point_deux_joueurs(data, joueur1, joueur2):
+    # S'assurer que la colonne 'ranking_date' est bien au format datetime
+    data['ranking_date'] = pd.to_datetime(data['ranking_date'])
+
+    # Créer le graphique
+    plt.figure(figsize=(12, 6))
+
+    # Tracer les deux courbes
+    plt.plot(data['ranking_date'], data['rankjoueur1'], label=joueur1.nom, color='blue', marker='o', linewidth=1)
+    plt.plot(data['ranking_date'], data['rankjoueur2'], label=joueur2.nom, color='red', marker='o', linewidth=1)
+
+    # Titre et axes
+    plt.title(f"Comparaison des Classements : {joueur1.nom} vs {joueur2.nom}")
+    plt.xlabel("Date")
+    plt.ylabel("Classement")
+    plt.gca().invert_yaxis()  # meilleur classement en haut
+    plt.grid(True)
+
+    # Formater les dates
+    ax = plt.gca()
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
+    ax.xaxis.set_major_locator(mdates.YearLocator())
+    plt.gcf().autofmt_xdate()
+
     plt.legend()
     plt.tight_layout()
     plt.show()

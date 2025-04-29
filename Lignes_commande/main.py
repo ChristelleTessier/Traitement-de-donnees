@@ -1,19 +1,8 @@
 import pandas as pd
 import os
 import sys
-
-
-
-# Récupère le chemin absolu du dossier où se trouve le script streamlit_app.py
-current_dir = os.path.dirname(os.path.abspath(__file__))
-code_path = os.path.abspath(os.path.join(current_dir, "..", "Code"))
-
-# Ajout au sys.path
-if code_path not in sys.path:
-    sys.path.insert(0, code_path)  # Priorité plus haute
-
-# Ensuite tu fais tes imports
 from creer_joueur import creer_joueur
+
 
 def application_tennis():
     # Importation
@@ -22,8 +11,6 @@ def application_tennis():
     from fonctions_divers import adversaire, palmares, boucle_01
     from zoom import zoom_graph
 
-
-    os.system('cls')
     print("=== Bienvenue sur l'application Joueur Tennis ===")
 
     appli_marche = True
@@ -43,6 +30,9 @@ def application_tennis():
             nom = input("Entrez le nom du joueur : ")
             joueur = creer_joueur(prenom=prenom, nom=nom)
 
+            if joueur == None:
+                print("❌ Aucun joueur trouvé !")
+
         elif joueur is None:
             print("❌ Aucun joueur créé. Créez un joueur d'abord !")
 
@@ -50,9 +40,7 @@ def application_tennis():
             afficher_joueur(joueur)
 
         elif choix == "3":
-            sous_menu_3(joueur)
             adversaire(joueur)
-
 
         elif choix == "4":
             sous_menu_4(joueur)

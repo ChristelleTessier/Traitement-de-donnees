@@ -150,15 +150,12 @@ def zoom_surface(data):
 
 
 
-def zoomer_tab_tournoi(joueur,indice):
+def zoomer_tab_tournoi(joueur, victoire):
 
     from fonctions_divers import boucle_01
 
-    os.system('cls')
-    if indice == "1":
-        data = joueur.chercher_resultat()
-    else :
-        data = joueur.chercher_tournoi_gagne()
+    data = joueur.chercher_resultat(victoire)
+
 
     print("Voulez-vous préciser des informations ?")
     choix = boucle_01()
@@ -201,7 +198,6 @@ def chercher_parcours(joueur,data):
                 print("L'identificant du tournoi doit apartenir à la liste :")
                 print(tournoi_id_liste)
 
-        os.system('cls')
         info_tournoi = data[data["tourney_id"] == tournoi_id ].values[0]
         type = info_tournoi[6]
         print(f"{info_tournoi[2]}, nom : {info_tournoi[3]}, "
