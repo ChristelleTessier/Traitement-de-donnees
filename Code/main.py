@@ -1,12 +1,29 @@
-import pandas as pd
-import os
-import sys
 from creer_joueur import creer_joueur
+from test_class import test_classification
 
 
 def application_tennis():
+    """
+    Lance l'application de gestion et d'analyse de joueurs de tennis.
+
+    Cette fonction affiche un menu principal permettant à l'utilisateur de :
+    - Créer ou sélectionner un joueur.
+    - Afficher les informations du joueur.
+    - Analyser ses adversaires les plus fréquents et comparer deux joueurs.
+    - Consulter son palmarès (tournois joués et gagnés).
+    - Visualiser l'évolution de son classement avec possibilité de zoom.
+    - Quitter l'application.
+
+    L'application continue de tourner jusqu'à ce que l'utilisateur choisisse de
+    la quitter.
+
+    Notes:
+        L'utilisateur doit d'abord créer ou sélectionner un joueur pour accéder
+        aux autres fonctionnalités.
+    """
+
     # Importation
-    from menu import menu_principal, sous_menu_3, sous_menu_4
+    from menu import menu_principal, sous_menu_4
     from afficher import afficher_joueur, afficher_nuage_point
     from fonctions_divers import adversaire, palmares, boucle_01
     from zoom import zoom_graph
@@ -30,13 +47,13 @@ def application_tennis():
             nom = input("Entrez le nom du joueur : ")
             joueur = creer_joueur(prenom=prenom, nom=nom)
 
-            if joueur == None:
+            if joueur is None:
                 print("❌ Aucun joueur trouvé !")
 
         elif joueur is None:
             print("❌ Aucun joueur créé. Créez un joueur d'abord !")
 
-        elif choix =="2":
+        elif choix == "2":
             afficher_joueur(joueur)
 
         elif choix == "3":
@@ -65,5 +82,8 @@ def application_tennis():
         else:
             print("Choix invalide. Veuillez réessayer.")
 
+
 if __name__ == "__main__":
-    application_tennis()
+    #application_tennis()
+
+    test_classification()
