@@ -48,7 +48,7 @@ def application_tennis():
             fonction_classification()
 
         else:
-            print("\n Choix invalide. Veuillez réessayer.\n")
+            print("\n ❌ Choix invalide. Veuillez réessayer.\n")
 
 
 if __name__ == "__main__":

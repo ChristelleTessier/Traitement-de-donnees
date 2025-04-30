@@ -146,24 +146,8 @@ def k_means_visualisation(X):
     plt.grid(True)
     plt.show()
 
-def clustering(X, noms_joueurs, k_optimal, scaler, genre):
-    # 5. Appliquer K-means avec le nombre optimal de clusters
-    kmeans = KMeans(n_clusters=k_optimal, random_state=42, n_init=10)
-    clusters = kmeans.fit_predict(X)
 
-    # 6. Visualiser les résultats avec PCA pour réduire à 2 dimensions
-    pca = PCA(n_components=2)
-    X_pca = pca.fit_transform(X)
-
-    # Créer un DataFrame pour faciliter la visualisation
-    import pandas as pd
-    df_result = pd.DataFrame({
-        'Joueur': noms_joueurs,
-        'Cluster': clusters,
-        'PCA1': X_pca[:, 0],
-        'PCA2': X_pca[:, 1]
-    })
-
+def visualisation_clustering(k_optimal, df_result):
     # Visualiser les clusters
     plt.figure(figsize=(12, 8))
     for cluster in range(k_optimal):
@@ -185,6 +169,27 @@ def clustering(X, noms_joueurs, k_optimal, scaler, genre):
     plt.legend()
     plt.grid(True)
     plt.show()
+
+
+def clustering(X, noms_joueurs, k_optimal, scaler, genre):
+    # 5. Appliquer K-means avec le nombre optimal de clusters
+    kmeans = KMeans(n_clusters=k_optimal, random_state=42, n_init=10)
+    clusters = kmeans.fit_predict(X)
+
+    # 6. Visualiser les résultats avec PCA pour réduire à 2 dimensions
+    pca = PCA(n_components=2)
+    X_pca = pca.fit_transform(X)
+
+    # Créer un DataFrame pour faciliter la visualisation
+    df_result = pd.DataFrame({
+        'Joueur': noms_joueurs,
+        'Cluster': clusters,
+        'PCA1': X_pca[:, 0],
+        'PCA2': X_pca[:, 1]
+    })
+
+    # Visualiser les clusters
+    visualisation_clustering(k_optimal, df_result)
 
     # 7. Analyser les caractéristiques de chaque cluster
     centroids = scaler.inverse_transform(kmeans.cluster_centers_)
@@ -209,25 +214,7 @@ def clustering(X, noms_joueurs, k_optimal, scaler, genre):
 
     return df_result, kmeans, df_centroids
 
-
-def clustering2(X, noms_joueurs, k_optimal, scaler, genre):
-    # 5. Appliquer K-means avec le nombre optimal de clusters
-    kmeans = KMeans(n_clusters=k_optimal, random_state=42, n_init=10)
-    clusters = kmeans.fit_predict(X)
-
-    # 6. Visualiser les résultats avec PCA pour réduire à 2 dimensions
-    pca = PCA(n_components=2)
-    X_pca = pca.fit_transform(X)
-
-    # Créer un DataFrame pour faciliter la visualisation
-    import pandas as pd
-    df_result = pd.DataFrame({
-        'Joueur': noms_joueurs,
-        'Cluster': clusters,
-        'PCA1': X_pca[:, 0],
-        'PCA2': X_pca[:, 1]
-    })
-
+def plot_cluster(k_optimal, df_result):
     # Visualiser les clusters
     plt.figure(figsize=(12, 8))
     for cluster in range(k_optimal):
@@ -249,29 +236,6 @@ def clustering2(X, noms_joueurs, k_optimal, scaler, genre):
     plt.legend()
     plt.grid(True)
     plt.show()
-
-    # 7. Analyser les caractéristiques de chaque cluster
-    centroids = scaler.inverse_transform(kmeans.cluster_centers_)
-
-    # Créer un DataFrame pour les centroïdes
-    colonnes = [
-        'Ratio victoires',
-        'Remontées après set perdu',
-        'Balles de break sauvées',
-        'Temps top 10',
-        'Temps top 11-50',
-        'Temps top 51-100',
-        'Main Droite',  # Nouvelle colonne pour l'encodage one-hot
-        'Main Gauche'   # Nouvelle colonne pour l'encodage one-hot
-    ]
-
-    if genre == "M":
-        colonnes.extend(["Sexe Homme", "Sexe Femme"])  # Ajouter les colonnes pour le sexe
-
-    df_centroids = pd.DataFrame(centroids, columns=colonnes)
-    df_centroids.index = [f'Cluster {i}' for i in range(k_optimal)]
-
-    return df_result, kmeans, df_centroids
 
 
 def predire_classe_nouveau_joueur(joueur, scaler, kmeans, genre):
@@ -328,7 +292,7 @@ def telechargement(choix):
 
     return data
 
-def interpretation(df_centroids, df_result, scaler, kmeans, genre):
+def interpretation(df_centroids, df_result, scaler, kmeans, genre, k_optimal):
     from menu import sous_menu_classification
     from fonctions_divers import sortie
 
@@ -342,12 +306,21 @@ def interpretation(df_centroids, df_result, scaler, kmeans, genre):
             appli_marche = sortie()
 
         elif choix == '1':
-            print("a faire")
+            visualisation_clustering(k_optimal, df_result)
 
         elif choix == "2":
             print("Caractéristiques moyennes des clusters:")
+
+            # Définir les options pour afficher toutes les colonnes et toutes les lignes
+            pd.set_option('display.max_rows', None)
+            pd.set_option('display.max_columns', None)
+
+            # Afficher le DataFrame
             print(df_centroids)
-            print("a faire")
+
+            # Réinitialiser les options d'affichage à leurs valeurs par défaut (facultatif)
+            pd.reset_option('display.max_rows')
+            pd.reset_option('display.max_columns')
 
         elif choix == "3":
             prenom = input("saisir prenom : ")
@@ -430,7 +403,7 @@ def classification(genre):
                     )
 
         df_result, kmeans, df_centroids = clustering(X, noms_joueurs, k_optimal_int, scaler, genre)
-        interpretation(df_centroids, df_result, scaler, kmeans, genre)
+        interpretation(df_centroids, df_result, scaler, kmeans, genre, k_optimal_int)
 
     else:
         print("Aucun joueur valide trouvé, impossible de continuer")

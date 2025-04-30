@@ -1,6 +1,6 @@
 def menu_principal():
-    print(" ########## Menu Principal ##########")
-    print("\nQue voulez-vous faire ?")
+    print("\n ########## Menu Principal ########## \n")
+    print("Que voulez-vous faire ?")
     print("\n1. Faire de l'étude de données")
     print("2. Faire de la classification")
 
@@ -19,7 +19,7 @@ def menu_joueur(joueur):
             L'objet joueur actuellement sélectionné, ou None si aucun
             n'est sélectionné.
     """
-    print(" ########## Menu JOUEUR ##########")
+    print("\n ########## Menu JOUEUR ########## \n")
     print("\nQue voulez-vous faire ?")
     if joueur is None:
         print("\n1. Saisir le nom/prenom d'un joueur")
@@ -43,9 +43,9 @@ def sous_menu_3(joueur):
             Le joueur sélectionné pour lequel on souhaite consulter
             les adversaires.
     """
-    print(" ########## Menu comparaison ##########")
+    print("\n ########## Menu comparaison ########## \n")
 
-    print(f"\nSous menu : Les adversaires de {joueur.prenom} {joueur.nom} ?")
+    print(f"Sous menu : Les adversaires de {joueur.prenom} {joueur.nom} ?")
 
     print("1. Saisir un deuxième joueur")
 
@@ -64,7 +64,7 @@ def sous_menu_32(joueur1, joueur2):
         joueur2 (Joueur):
             Deuxième joueur à comparer.
     """
-    print(" ########## Comparaison de deux joueurs ##########")
+    print("\n ########## Comparaison de deux joueurs ########## \n")
     print(
         f"Sous menu : Comparer {joueur1.prenom} {joueur1.nom} "
         f"et {joueur2.prenom} {joueur2.nom}"
@@ -87,7 +87,7 @@ def sous_menu_4(joueur):
         joueur (Joueur):
             Le joueur sélectionné pour l'affichage du palmarès.
     """
-    print(" ########## Menu PALMARES ##########")
+    print("\n ########## Menu PALMARES ########## \n")
     print(f"Sous menu : Le palmares de {joueur.prenom} {joueur.nom} ?")
 
     print("\n1. Les résultats aux différents tournois (général)")
@@ -96,8 +96,8 @@ def sous_menu_4(joueur):
     print("\n10. Revenir au menu joueur")
 
 def menu_classification():
-    print(" ########## Menu CLASSIFICATION ##########")
-    print('\nQue voulez vous classifier :')
+    print("\n ########## Menu CLASSIFICATION ########## \n")
+    print('Que voulez vous classifier :')
     print("1. Un groupe d'homme")
     print("2. Un groupe de femme")
     print("3. un groupe mixte")
@@ -105,8 +105,8 @@ def menu_classification():
     print("\n10. Revenir au menu principal")
 
 def sous_menu_classification():
-    print(" ########## Travailler sur la classification ##########")
-    print('\nQue voulez vous faire ?')
+    print("\n ########## Travailler sur la classification ########## \n")
+    print('Que voulez vous faire ?')
     print("1. Afficher le graphique de classification")
     print("2. Afficher le tableau de répartition")
     print("3. Trouver la classe d'un nouveau joueur")

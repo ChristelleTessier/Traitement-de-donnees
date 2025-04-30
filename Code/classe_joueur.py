@@ -363,8 +363,8 @@ class Joueur:
         data = self.data_match()
         data = data[["winner_id", "loser_id"]]
 
-        data_temp_win = data[data["winner_id"] == id_joueur]
-        data_temp_loser = data[data["loser_id"] == id_joueur]
+        data_temp_win = data[data["winner_id"] == id_joueur].copy()
+        data_temp_loser = data[data["loser_id"] == id_joueur].copy()
 
         data_temp_win.rename(
             columns={"winner_id": "joueur", "loser_id": "adversaire"},
@@ -484,5 +484,3 @@ class Joueur:
             suffixes=('joueur1', 'joueur2'))
 
         return fusion
-
-    

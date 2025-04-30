@@ -40,9 +40,7 @@ def adversaire(joueur):
             break
 
         else:
-            print("Choix invalide. Veuillez réessayer.")
-
-        input("\nAppuie sur Entrée pour voir la suite...")
+            print("\n Choix invalide. Veuillez réessayer. \n")
 
 
 def comparaison(joueur1, joueur2):
@@ -82,7 +80,6 @@ def comparaison(joueur1, joueur2):
 
         elif choix == "3":
             data = joueur1.comparer_rang(joueur2)
-            print(data)
             afficher_nuage_point_deux_joueurs(data, joueur1, joueur2)
 
             print("Voulez-vous zommer sur une période ?")
@@ -91,13 +88,12 @@ def comparaison(joueur1, joueur2):
                 data2 = zoom_graph(data)
                 afficher_nuage_point_deux_joueurs(data2, joueur1, joueur2)
                 zoomer = boucle_01()
-            input("\nAppuie sur Entrée pour voir la suite...")
 
         elif choix == "10":
             break
 
         else:
-            print("Choix invalide. Veuillez réessayer.")
+            print("\n Choix invalide. Veuillez réessayer. \n")
 
 
 def palmares(joueur):
