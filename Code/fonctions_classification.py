@@ -335,15 +335,16 @@ def interpretation(df_centroids, df_result, scaler, kmeans, genre, k_optimal):
                     print(f"\n{nom_complet} serait classé dans le cluster : {classe}")
                 else:
                     print(f"{nom_complet} fait partie du jeu de donnée initial")
+                    print(f"Il fait partie de la classe {df_result[df_result['Joueur'] == nom_complet]['cluster']}")
             else:
                 print("Le joueur n'a pas ete trouvé")
 
         else:
             print("\n Valeur saisie invalide \n")
 
-def classification(genre):
+def classification(choix, genre):
 
-    data = telechargement(genre)
+    data = telechargement(choix)
 
     liste_id_win = list(data["winner_id"].unique())
     liste_id_los = list(data["loser_id"].unique())
@@ -369,8 +370,6 @@ def classification(genre):
                 "Erreur : Veuillez entrer indice entre 11 et "
                 f"{len(liste_id)} (un nombre entier)."
                 )
-
-
 
     # Création de la liste des id des joueurs
     joueurs = preparer_donnees_classification(liste_id, genre, nb_element_int)
@@ -433,7 +432,7 @@ def fonction_classification():
             else:
                 genre = 'M'
 
-            classification(genre)
+            classification(choix, genre)
 
         else:
             print("\n Choix invalide. Veuillez réessayer. \n")
