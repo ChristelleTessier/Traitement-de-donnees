@@ -84,6 +84,8 @@ def application_tennis():
 
 
 if __name__ == "__main__":
-    #application_tennis()
-
-    test_classification()
+    choix = input("0 application 1 classification")
+    if choix == "1":
+        application_tennis()
+    else:
+        test_classification()
