@@ -485,32 +485,4 @@ class Joueur:
 
         return fusion
 
-    def classification(self):
-        pass
-
-
-    def clustering_joueurs(liste_joueurs, n_clusters=3):
-
-        X = np.array([[
-            j.nb_tournois_gagne,
-            j.nb_sem_classe,
-            j.prop_vic_set_1_perdu
-            ] for j in liste_joueurs])
-
-        # PCA
-        X_pca = PCA(n_components=2).fit_transform(X)
-
-        # KMeans
-        kmeans = KMeans(n_clusters=n_clusters, random_state=42)
-        labels = kmeans.fit_predict(X)
-
-        # Visualisation
-        plt.figure(figsize=(8,6))
-        plt.scatter(X_pca[:,0], X_pca[:,1], c=labels, cmap='Set1', s=50)
-        plt.title("Clustering des joueurs en 2D")
-        plt.xlabel("PCA 1")
-        plt.ylabel("PCA 2")
-        plt.grid(True)
-        plt.show()
-
-        return labels
+    
